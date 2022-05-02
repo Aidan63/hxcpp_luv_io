@@ -3,6 +3,7 @@
 #include <array>
 
 #include "HxcppLuv.hpp"
+#include "AutoGCZone.hpp"
 
 struct uv_close_callback_data {
     hx::Object* callback;
@@ -179,14 +180,11 @@ void cpp::luv::cbReadPipe(uv_stream_t* stream, ssize_t nread, const uv_buf_t* bu
 
 uv_handle_t* cpp::luv::queue_repeat_task(uv_loop_t* loop, int interval_ms, Dynamic task)
 {
-    auto callback = [](uv_timer_t* t) {
-        hx::ExitGCFreeZone();
-
-        auto task = Dynamic{ *reinterpret_cast<hx::Object**>(t->data) };
+    auto callback = [](uv_timer_t* timer) {
+        auto gcZone = cpp::utils::AutoGCZone();
+        auto task   = Dynamic{ *reinterpret_cast<hx::Object**>(timer->data) };
 
         task();
-
-        hx::EnterGCFreeZone();
     };
 
     auto rootTask = new hx::Object*(task.mPtr);
@@ -194,10 +192,9 @@ uv_handle_t* cpp::luv::queue_repeat_task(uv_loop_t* loop, int interval_ms, Dynam
     auto timer = new uv_timer_t();
     timer->data     = rootTask;
     timer->close_cb = [](uv_handle_t* h) {
-        auto task = reinterpret_cast<hx::Object**>(h->data);
+        hx::GCRemoveRoot(reinterpret_cast<hx::Object**>(h->data));
 
-        hx::GCRemoveRoot(task);
-
+        delete h->data;
         delete h;
     };
 

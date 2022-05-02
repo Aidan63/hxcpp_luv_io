@@ -29,14 +29,17 @@ enum abstract RunMode(Int) {
 <files id='haxe'>
     <compilerflag value='-ID:/programming/cpp/vcpkg/packages/libuv_x86-windows/include'/>
     <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv'/>
+    <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils'/>
 
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuv.cpp'/>
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvFile.cpp'/>
+    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils/AutoGCZone.cpp'/>
 </files>
 
 <files id='luv'>
     <compilerflag value='-ID:/programming/cpp/vcpkg/packages/libuv_x86-windows/include'/>
     <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv'/>
+    <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils'/>
 </files>
 
 <target id='haxe'>
