@@ -38,7 +38,7 @@ std::unique_ptr<uv_fs_t, void(*)(uv_fs_t*)> make_uv_fs_t(uv_fs_t* request)
     } };
 }
 
-void cpp::luv::file::open(uv_loop_t* loop, String file, int mode, Dynamic callback)
+void cpp::luv::file::open(uv_loop_t* loop, String file, int flags, Dynamic callback)
 {
     auto wrapper = [](uv_fs_t* request) {
         auto gcZone    = cpp::utils::AutoGCZone();
@@ -53,7 +53,7 @@ void cpp::luv::file::open(uv_loop_t* loop, String file, int mode, Dynamic callba
     auto request      = new uv_fs_t();
     request->data = rootCallback;
 
-    uv_fs_open(loop, request, file.utf8_str(), mode, 0, wrapper);
+    uv_fs_open(loop, request, file.utf8_str(), flags, 0, wrapper);
     
     hx::GCAddRoot(rootCallback);
 }
@@ -85,9 +85,92 @@ void cpp::luv::file::write(uv_loop_t* loop, uv_file file, Array<uint8_t> data, D
     hx::GCAddRoot(rootData);
 }
 
-void cpp::luv::file::read(uv_loop_t* loop, uv_file file, Dynamic callback)
+class ReadRequestData
 {
-    //
+private:
+    std::array<char, 1024> data;
+public:
+    uv_loop_t* loop;
+    uv_file file;
+    hx::Object** array;
+    hx::Object** callbackSuccess;
+    hx::Object** callbackError;
+    uv_buf_t buffer;
+
+    ReadRequestData(uv_loop_t* l, uv_file f, hx::Object* a, hx::Object* cbSuccess, hx::Object* cbError) :
+        loop(l),
+        file(f),
+        data(std::array<char, 1024>()),
+        buffer(uv_buf_init(data.data(), data.size())),
+        array(new hx::Object*(a)),
+        callbackSuccess(new hx::Object*(cbSuccess)),
+        callbackError(new hx::Object*(cbError))
+    {
+        hx::GCAddRoot(array);
+        hx::GCAddRoot(callbackSuccess);
+        hx::GCAddRoot(callbackError);
+    }
+
+    ~ReadRequestData()
+    {
+        hx::GCRemoveRoot(array);
+        hx::GCRemoveRoot(callbackSuccess);
+        hx::GCRemoveRoot(callbackError);
+
+        delete array;
+        delete callbackSuccess;
+        delete callbackError;
+    }
+};
+
+void read_callback(uv_fs_t* request)
+{
+    if (request->result < 0)
+    {
+        auto gcZone        = cpp::utils::AutoGCZone();
+        auto spResult      = make_uv_fs_t(request);
+        auto spRequestData = std::unique_ptr<ReadRequestData>{ reinterpret_cast<ReadRequestData*>(request->data) };
+        auto callback      = Dynamic{ *spRequestData->callbackSuccess };
+
+        callback(request->result);
+    }
+    else if (request->result == 0)
+    {
+        // no more data, invoke the haxe callback and cleanup
+        auto gcZone        = cpp::utils::AutoGCZone();
+        auto spResult      = make_uv_fs_t(request);
+        auto spRequestData = std::unique_ptr<ReadRequestData>{ reinterpret_cast<ReadRequestData*>(request->data) };
+        auto callback      = Dynamic{ *spRequestData->callbackSuccess };
+        auto array         = Dynamic{ *spRequestData->array };
+
+        callback(array);
+    }
+    else
+    {
+        auto gcZone      = cpp::utils::AutoGCZone();
+        auto requestData = reinterpret_cast<ReadRequestData*>(request->data);
+        auto array       = Array<char>{ reinterpret_cast<Array_obj<char>*>(*requestData->array) };
+        auto baseLength  = array->length;
+        auto newLength   = baseLength + request->result;
+
+        array->EnsureSize(newLength);
+
+        for (auto i = 0; i < request->result; i++)
+        {
+            array[baseLength + i] = requestData->buffer.base[i];
+        }
+
+        uv_fs_read(requestData->loop, request, requestData->file, &requestData->buffer, 1, -1, read_callback);
+    }
+}
+
+void cpp::luv::file::read(uv_loop_t* loop, uv_file file, Dynamic callbackSuccess, Dynamic callbackError)
+{
+    auto data    = new ReadRequestData(loop, file, Array<char>(0, 0).mPtr, callbackSuccess.mPtr, callbackError.mPtr);
+    auto request = new uv_fs_t();
+    request->data = data;
+
+    uv_fs_read(loop, request, file, &data->buffer, 1, -1, read_callback);
 }
 
 void cpp::luv::file::close(uv_loop_t* loop, uv_file file, Dynamic callback)

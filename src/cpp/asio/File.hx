@@ -1,5 +1,6 @@
 package cpp.asio;
 
+import haxe.io.BytesData;
 import haxe.ds.Option;
 import sys.thread.Thread;
 import haxe.io.Bytes;
@@ -62,6 +63,15 @@ class File
                     _callback(Option.Some(new Code(result)));
                 }
             });
+    }
+
+    public function read(_callback : Result<Bytes, Code>->Void)
+    {
+        cpp.luv.File.read(
+            @:privateAccess Thread.current().events.luvLoop,
+            file,
+            data -> _callback(Result.Success(Bytes.ofData(data))),
+            code -> _callback(Result.Error(new Code(code))));
     }
 
     public function close(_callback : Void->Void)

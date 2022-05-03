@@ -12,7 +12,7 @@ namespace cpp::luv::file
 
     void write(uv_loop_t*, uv_file, Array<uint8_t>, Dynamic);
 
-    void read(uv_loop_t*, uv_file, Dynamic);
+    void read(uv_loop_t*, uv_file, Dynamic, Dynamic);
 
     void close(uv_loop_t*, uv_file, Dynamic);
 }
