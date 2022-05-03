@@ -18,5 +18,5 @@ extern class File
     static function write(_loop : LuvLoop, _file : Int, _data : BytesData, _callback : Int->Void) : Void;
 
     @:native('cpp::luv::file::close')
-    static function close(_loop : LuvLoop, _file : Int, _callback : Void->Void) : Void;
+    static function close(_loop : LuvLoop, _file : Int, _callback : Int->Void) : Void;
 }

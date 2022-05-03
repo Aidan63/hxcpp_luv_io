@@ -53,9 +53,18 @@ void cpp::luv::file::open(uv_loop_t* loop, String file, int flags, Dynamic callb
     auto request      = new uv_fs_t();
     request->data = rootCallback;
 
-    uv_fs_open(loop, request, file.utf8_str(), flags, 0, wrapper);
-    
-    hx::GCAddRoot(rootCallback);
+    auto result = uv_fs_open(loop, request, file.utf8_str(), flags, 0, wrapper);
+    if (result < 0)
+    {
+        delete rootCallback;
+        delete request;
+
+        callback(result);
+    }
+    else
+    {
+        hx::GCAddRoot(rootCallback);
+    }
 }
 
 void cpp::luv::file::write(uv_loop_t* loop, uv_file file, Array<uint8_t> data, Dynamic callback)
@@ -79,10 +88,22 @@ void cpp::luv::file::write(uv_loop_t* loop, uv_file file, Array<uint8_t> data, D
     auto request = new uv_fs_t();
     request->data = new std::pair<hx::Object**, hx::Object**>(rootCallback, rootData);
 
-    uv_fs_write(loop, request, file, &buffer, 1, -1, wrapper);
+    auto result = uv_fs_write(loop, request, file, &buffer, 1, -1, wrapper);
+    if (result < 0)
+    {
+        delete rootCallback;
+        delete rootData;
 
-    hx::GCAddRoot(rootCallback);
-    hx::GCAddRoot(rootData);
+        delete request->data;
+        delete request;
+
+        callback(result);
+    }
+    else
+    {
+        hx::GCAddRoot(rootCallback);
+        hx::GCAddRoot(rootData);
+    }
 }
 
 class ReadRequestData
@@ -160,7 +181,15 @@ void read_callback(uv_fs_t* request)
             array[baseLength + i] = requestData->buffer.base[i];
         }
 
-        uv_fs_read(requestData->loop, request, requestData->file, &requestData->buffer, 1, -1, read_callback);
+        auto result = uv_fs_read(requestData->loop, request, requestData->file, &requestData->buffer, 1, -1, read_callback);
+        if (result < 0)
+        {
+            auto spResult      = make_uv_fs_t(request);
+            auto spRequestData = std::unique_ptr<ReadRequestData>{ reinterpret_cast<ReadRequestData*>(request->data) };
+            auto callback      = Dynamic{ *spRequestData->callbackSuccess };
+
+            callback(result);
+        }
     }
 }
 
@@ -170,7 +199,14 @@ void cpp::luv::file::read(uv_loop_t* loop, uv_file file, Dynamic callbackSuccess
     auto request = new uv_fs_t();
     request->data = data;
 
-    uv_fs_read(loop, request, file, &data->buffer, 1, -1, read_callback);
+    auto result = uv_fs_read(loop, request, file, &data->buffer, 1, -1, read_callback);
+    if (result < 0)
+    {
+        delete data;
+        delete request;
+
+        callbackError(result);
+    }
 }
 
 void cpp::luv::file::close(uv_loop_t* loop, uv_file file, Dynamic callback)
@@ -181,14 +217,24 @@ void cpp::luv::file::close(uv_loop_t* loop, uv_file file, Dynamic callback)
         auto spRequest = make_uv_fs_t(request);
         auto callback  = Dynamic{ object };
 
-        callback();
+        callback(spRequest->result);
     };
 
     auto rootCallback = new hx::Object*(callback.mPtr);
     auto request      = new uv_fs_t();
     request->data = rootCallback;
 
-    uv_fs_close(loop, request, file, wrapper);
+    auto result = uv_fs_close(loop, request, file, wrapper);
+    if (result < 0)
+    {
+        delete rootCallback;
+        delete request;
 
-    hx::GCAddRoot(rootCallback);
+        callback(result);
+    }
+    else
+    {
+        hx::GCAddRoot(rootCallback);
+    }
+
 }

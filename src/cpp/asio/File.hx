@@ -53,16 +53,7 @@ class File
             @:privateAccess Thread.current().events.luvLoop,
             file,
             _data.getData(),
-            result -> {
-                if (result >= 0)
-                {
-                    _callback(Option.None);
-                }
-                else
-                {
-                    _callback(Option.Some(new Code(result)));
-                }
-            });
+            result -> _callback(resultToOptionCode(result)));
     }
 
     public function read(_callback : Result<Bytes, Code>->Void)
@@ -74,12 +65,12 @@ class File
             code -> _callback(Result.Error(new Code(code))));
     }
 
-    public function close(_callback : Void->Void)
+    public function close(_callback : Option<Code>->Void)
     {
         cpp.luv.File.close(
             @:privateAccess Thread.current().events.luvLoop,
             file,
-            _callback);
+            result -> _callback(resultToOptionCode(result)));
     }
 
     public static function open(_file : String, _mode : OpenMode, _callback : Result<File, Code>->Void)
@@ -98,5 +89,17 @@ class File
                     _callback(Result.Error(new Code(result)));
                 }
             });
+    }
+
+    static function resultToOptionCode(_result)
+    {
+        return if (_result >= 0)
+        {
+            Option.None;
+        }
+        else
+        {
+            Option.Some(new Code(_result));
+        }
     }
 }
