@@ -151,7 +151,7 @@ void read_callback(uv_fs_t* request)
         auto gcZone        = cpp::utils::AutoGCZone();
         auto spResult      = make_uv_fs_t(request);
         auto spRequestData = std::unique_ptr<ReadRequestData>{ reinterpret_cast<ReadRequestData*>(request->data) };
-        auto callback      = Dynamic{ *spRequestData->callbackSuccess };
+        auto callback      = Dynamic{ *spRequestData->callbackError };
 
         callback(request->result);
     }
@@ -186,7 +186,7 @@ void read_callback(uv_fs_t* request)
         {
             auto spResult      = make_uv_fs_t(request);
             auto spRequestData = std::unique_ptr<ReadRequestData>{ reinterpret_cast<ReadRequestData*>(request->data) };
-            auto callback      = Dynamic{ *spRequestData->callbackSuccess };
+            auto callback      = Dynamic{ *spRequestData->callbackError };
 
             callback(result);
         }
