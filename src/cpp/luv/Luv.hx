@@ -25,9 +25,7 @@ enum abstract RunMode(Int) {
 <compiler id='MSVC' exe='cl.exe'>
     <flag value = '/std:c++17'/>
 </compiler>
-
 <files id='haxe'>
-    <compilerflag value='-ID:/programming/cpp/vcpkg/packages/libuv_x86-windows/include'/>
     <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv'/>
     <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils'/>
 
@@ -37,15 +35,12 @@ enum abstract RunMode(Int) {
 </files>
 
 <files id='luv'>
-    <compilerflag value='-ID:/programming/cpp/vcpkg/packages/libuv_x86-windows/include'/>
     <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv'/>
     <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils'/>
 </files>
 
 <target id='haxe'>
     <files id='luv'/>
-
-    <lib name = 'D:/programming/cpp/vcpkg/packages/libuv_x86-windows/debug/lib/libuv.lib'/>
 </target>")
 extern class Luv
 {

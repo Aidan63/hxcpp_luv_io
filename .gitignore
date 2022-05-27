@@ -2,3 +2,4 @@
 .vscode
 bin
 node_modules
+vcpkg_installed
