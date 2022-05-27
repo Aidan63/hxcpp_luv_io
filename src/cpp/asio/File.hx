@@ -1,37 +1,8 @@
 package cpp.asio;
 
-import haxe.io.BytesData;
 import haxe.ds.Option;
 import sys.thread.Thread;
 import haxe.io.Bytes;
-
-extern enum abstract OpenMode(Int) to Int
-{
-    @:native('UV_FS_O_APPEND') var Append;
-    @:native('UV_FS_O_CREAT') var Create;
-    @:native('UV_FS_O_DIRECT') var Direct;
-    @:native('UV_FS_O_DIRECTORY') var Directory;
-    @:native('UV_FS_O_DSYNC') var DSync;
-    @:native('UV_FS_O_EXCL') var Exclusive;
-    @:native('UV_FS_O_EXLOCK') var ExclusiveLock;
-    @:native('UV_FS_O_FILEMAP') var FileMap;
-    @:native('UV_FS_O_NOATIME') var NoAccessTime;
-    @:native('UV_FS_O_NOCTTY') var NoControllingTerminal;
-    @:native('UV_FS_O_NOFOLLOW') var NoFollow;
-    @:native('UV_FS_O_NONBLOCK') var NonBlocking;
-    @:native('UV_FS_O_RANDOM') var Random;
-    @:native('UV_FS_O_RDONLY') var ReadOnly;
-    @:native('UV_FS_O_RDWR') var ReadWrite;
-    @:native('UV_FS_O_SEQUENTIAL') var Sequential;
-    @:native('UV_FS_O_SYMLINK') var SymLink;
-    @:native('UV_FS_O_SYNC') var Synchronous;
-    @:native('UV_FS_O_TEMPORARY') var Temporary;
-    @:native('UV_FS_O_TRUNC') var Truncate;
-    @:native('UV_FS_O_WRONLY') var WriteOnly;
-
-    @:op(a|b) static function or(a : OpenMode, b : OpenMode) : OpenMode;
-    @:op(a&b) static function or(a : OpenMode, b : OpenMode) : OpenMode;
-}
 
 class File
 {
@@ -42,12 +13,12 @@ class File
         file = _file;
     }
 
-    public inline extern overload function write(_string : String, _callback : Option<Code>->Void)
+    public inline extern overload function write(_string : String, _callback : (_error : Option<Code>)->Void)
     {
         write(Bytes.ofString(_string), _callback);
     }
 
-    public inline extern overload function write(_data : Bytes, _callback : Option<Code>->Void)
+    public inline extern overload function write(_data : Bytes, _callback : (_error : Option<Code>)->Void)
     {
         cpp.luv.File.write(
             @:privateAccess Thread.current().events.luvLoop,
@@ -73,11 +44,12 @@ class File
             result -> _callback(resultToOptionCode(result)));
     }
 
-    public static function open(_file : String, _mode : OpenMode, _callback : Result<File, Code>->Void)
+    public static function open(_file : String, _flags : OpenMode, _mode : AccessMode, _callback : Result<File, Code>->Void)
     {
         cpp.luv.File.open(
             @:privateAccess Thread.current().events.luvLoop,
             _file,
+            _flags,
             _mode,
             result -> {
                 if (result >= 0)

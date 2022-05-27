@@ -8,7 +8,7 @@
 
 namespace cpp::luv::file
 {
-    void open(uv_loop_t*, String, int, Dynamic);
+    void open(uv_loop_t*, String, int, int, Dynamic);
 
     void write(uv_loop_t*, uv_file, Array<uint8_t>, Dynamic);
 

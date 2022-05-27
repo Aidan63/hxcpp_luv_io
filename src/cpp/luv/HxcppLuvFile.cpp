@@ -38,7 +38,7 @@ std::unique_ptr<uv_fs_t, void(*)(uv_fs_t*)> make_uv_fs_t(uv_fs_t* request)
     } };
 }
 
-void cpp::luv::file::open(uv_loop_t* loop, String file, int flags, Dynamic callback)
+void cpp::luv::file::open(uv_loop_t* loop, String file, int flags, int mode, Dynamic callback)
 {
     auto wrapper = [](uv_fs_t* request) {
         auto gcZone    = cpp::utils::AutoGCZone();
@@ -53,7 +53,7 @@ void cpp::luv::file::open(uv_loop_t* loop, String file, int flags, Dynamic callb
     auto request      = new uv_fs_t();
     request->data = rootCallback;
 
-    auto result = uv_fs_open(loop, request, file.utf8_str(), flags, 0, wrapper);
+    auto result = uv_fs_open(loop, request, file.utf8_str(), flags, mode, wrapper);
     if (result < 0)
     {
         delete rootCallback;

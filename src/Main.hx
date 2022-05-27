@@ -1,6 +1,9 @@
 import cpp.vm.Gc;
-import sys.thread.Thread;
 import cpp.asio.File;
+import cpp.asio.OpenMode;
+import cpp.asio.AccessMode;
+import sys.thread.Thread;
+import haxe.Exception;
 
 class Main {
     static function main() {
@@ -10,7 +13,7 @@ class Main {
             Gc.run(true);
         }, 1000);
 
-        File.open('test.txt', OpenMode.Create | OpenMode.Append | OpenMode.WriteOnly, result -> {
+        File.open('C:\\Users\\AidanLee\\Desktop\\hxcpp_luv\\test.txt', OpenMode.WriteOnly | OpenMode.Create, AccessMode.UserReadWriteExecute, result -> {
             switch result {
                 case Success(file):
                     trace('file opened');
@@ -22,11 +25,17 @@ class Main {
                             case None:
                                 trace('write succeeded');
                         }
+
+                        file.close(result -> {
+                            switch result {
+                                case Some(v):
+                                    trace('failed to close file $v');
+                                case None:
+                                    trace('file closed');
+                            }
+                        });
                     });
 
-                    file.close(() -> {
-                        trace('file closed');
-                    });
                 case Error(code):
                     trace('failed to open file $code');
             }
