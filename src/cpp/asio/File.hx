@@ -1,16 +1,30 @@
 package cpp.asio;
 
-import haxe.ds.Option;
 import sys.thread.Thread;
+import haxe.ds.Option;
 import haxe.io.Bytes;
+import haxe.io.ArrayBufferView;
 
 class File
 {
     final file : Int;
 
+    final pipe : cpp.luv.Luv.LuvPipe;
+
     function new(_file)
     {
         file = _file;
+        pipe = cpp.luv.Pipe.open(@:privateAccess Thread.current().events.luvLoop, _file);
+    }
+
+    public inline extern overload function write2(_buffer : ArrayBufferView)
+    {
+        //
+    }
+
+    public inline extern overload function write2(_buffer : ArrayBufferView, _callback : (_error : Option<Code>)->Void)
+    {
+        //
     }
 
     public inline extern overload function write(_string : String, _callback : (_error : Option<Code>)->Void)

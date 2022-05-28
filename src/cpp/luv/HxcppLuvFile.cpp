@@ -6,28 +6,7 @@
 
 #include "HxcppLuvFile.hpp"
 #include "AutoGCZone.hpp"
-
-class RootedObject
-{
-private:
-    hx::Object** rooted;
-
-public:
-    RootedObject(void* baton) : rooted(reinterpret_cast<hx::Object**>(baton)) { }
-    RootedObject(hx::Object** object) : rooted(object) { }
-
-    ~RootedObject()
-    {
-        hx::GCRemoveRoot(rooted);
-
-        delete rooted;
-    }
-
-    operator hx::Object*() const
-    {
-        return *rooted;
-    }
-};
+#include "RootedObject.hpp"
 
 std::unique_ptr<uv_fs_t, void(*)(uv_fs_t*)> make_uv_fs_t(uv_fs_t* request)
 {
@@ -42,7 +21,7 @@ void cpp::luv::file::open(uv_loop_t* loop, String file, int flags, int mode, Dyn
 {
     auto wrapper = [](uv_fs_t* request) {
         auto gcZone    = cpp::utils::AutoGCZone();
-        auto object    = RootedObject(request->data);
+        auto object    = cpp::utils::RootedObject(request->data);
         auto spRequest = make_uv_fs_t(request);
         auto callback  = Dynamic{ object };
 
@@ -75,8 +54,8 @@ void cpp::luv::file::write(uv_loop_t* loop, uv_file file, Array<uint8_t> data, D
         auto gcZone     = cpp::utils::AutoGCZone();
         auto spResult   = make_uv_fs_t(request);
         auto spPair     = std::unique_ptr<std::pair<hx::Object**, hx::Object**>>{ reinterpret_cast<std::pair<hx::Object**, hx::Object**>*>(request->data) };
-        auto rootObject = RootedObject(spPair->first);
-        auto rootData   = RootedObject(spPair->second);
+        auto rootObject = cpp::utils::RootedObject(spPair->first);
+        auto rootData   = cpp::utils::RootedObject(spPair->second);
         auto callback   = Dynamic{ rootObject };
 
         callback(request->result);
@@ -213,7 +192,7 @@ void cpp::luv::file::close(uv_loop_t* loop, uv_file file, Dynamic callback)
 {
     auto wrapper = [](uv_fs_t* request) {
         auto gcZone    = cpp::utils::AutoGCZone();
-        auto object    = RootedObject(request->data);
+        auto object    = cpp::utils::RootedObject(request->data);
         auto spRequest = make_uv_fs_t(request);
         auto callback  = Dynamic{ object };
 
