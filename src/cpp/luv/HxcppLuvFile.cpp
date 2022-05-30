@@ -15,6 +15,10 @@ private:
 public:
     RootedObject(void* baton) : rooted(reinterpret_cast<hx::Object**>(baton)) { }
     RootedObject(hx::Object** object) : rooted(object) { }
+    RootedObject(hx::Object* object) : rooted(new hx::Object*(object))
+    {
+        hx::GCAddRoot(rooted);
+    }
 
     ~RootedObject()
     {
@@ -31,11 +35,13 @@ public:
 
 std::unique_ptr<uv_fs_t, void(*)(uv_fs_t*)> make_uv_fs_t(uv_fs_t* request)
 {
-    return std::unique_ptr<uv_fs_t, void(*)(uv_fs_t*)>{ request, [](uv_fs_t* r) {
-        uv_fs_req_cleanup(r);
+    auto cleanup = [](uv_fs_t* request) {
+        uv_fs_req_cleanup(request);
 
-        delete r;
-    } };
+        delete request;
+    };
+
+    return std::unique_ptr<uv_fs_t, void(*)(uv_fs_t*)>{ request, cleanup };
 }
 
 void cpp::luv::file::open(uv_loop_t* loop, String file, int flags, int mode, Dynamic callback)
@@ -67,42 +73,47 @@ void cpp::luv::file::open(uv_loop_t* loop, String file, int flags, int mode, Dyn
     }
 }
 
-void cpp::luv::file::write(uv_loop_t* loop, uv_file file, Array<uint8_t> data, Dynamic callback)
-{  
-    auto buffer = uv_buf_init(data->getBase(), data->length);
+void cpp::luv::file::write(uv_loop_t* loop, uv_file file, Array<uint8_t> data, int offset, int length, Dynamic callback)
+{
+    auto buffer = uv_buf_init(data->getBase() + offset, length);
 
-    auto wrapper = [](uv_fs_t* request) {
-        auto gcZone     = cpp::utils::AutoGCZone();
-        auto spResult   = make_uv_fs_t(request);
-        auto spPair     = std::unique_ptr<std::pair<hx::Object**, hx::Object**>>{ reinterpret_cast<std::pair<hx::Object**, hx::Object**>*>(request->data) };
-        auto rootObject = RootedObject(spPair->first);
-        auto rootData   = RootedObject(spPair->second);
-        auto callback   = Dynamic{ rootObject };
-
-        callback(request->result);
-    };
-
-    auto rootCallback = new hx::Object*(callback.mPtr);
-    auto rootData     = new hx::Object*(data.mPtr);
-
-    auto request = new uv_fs_t();
-    request->data = new std::pair<hx::Object**, hx::Object**>(rootCallback, rootData);
-
-    auto result = uv_fs_write(loop, request, file, &buffer, 1, -1, wrapper);
-    if (result < 0)
+    if (null() == callback)
     {
-        delete rootCallback;
-        delete rootData;
+        auto request = uv_fs_t();
 
-        delete request->data;
-        delete request;
-
-        callback(result);
+        uv_fs_write(loop, &request, file, &buffer, 1, -1, nullptr);
     }
     else
     {
-        hx::GCAddRoot(rootCallback);
-        hx::GCAddRoot(rootData);
+        class WriteRequest
+        {
+        public:
+            RootedObject array;
+            RootedObject callback;
+
+            WriteRequest(hx::Object* _array, hx::Object* _callback) : array(RootedObject(_array)), callback(RootedObject(_callback)) {}
+        };
+
+        auto wrapper = [](uv_fs_t* request) {
+            auto gcZone     = cpp::utils::AutoGCZone();
+            auto spResult   = make_uv_fs_t(request);
+            auto spData     = std::unique_ptr<WriteRequest>{ reinterpret_cast<WriteRequest*>(request->data) };
+            auto callback   = Dynamic(spData->callback);
+
+            callback(request->result);
+        };
+
+        auto request = new uv_fs_t();
+        request->data = new WriteRequest(data.mPtr, callback.mPtr);
+
+        auto result = uv_fs_write(loop, request, file, &buffer, 1, -1, wrapper);
+        if (result < 0)
+        {
+            delete request->data;
+            delete request;
+
+            callback(result);
+        }
     }
 }
 

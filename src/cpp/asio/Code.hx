@@ -13,4 +13,9 @@ abstract Code(Int) to Int
     {
         return Luv.errorToString(this);
     }
+
+    public function isError()
+    {
+        return this < 0;
+    }
 }
