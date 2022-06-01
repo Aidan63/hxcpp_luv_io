@@ -13,7 +13,7 @@ extern class File
     static function open(_loop : LuvLoop, _file : String, _flags : Int, _mode : Int, _callback : Int->Void) : Void;
 
     @:native('cpp::luv::file::read')
-    static function read(_loop : LuvLoop, _file : Int, _success : BytesData->Void, _fail : Int->Void) : Void;
+    static function read(_loop : LuvLoop, _file : Int, _offset : Int, _success : BytesData->Void, _fail : Int->Void) : Void;
 
     @:native('cpp::luv::file::write')
     static function write(_loop : LuvLoop, _file : Int, _data : BytesData, _offset : Int, _length : Int, _callback : Code->Void) : Void;

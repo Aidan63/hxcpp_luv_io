@@ -120,39 +120,24 @@ void cpp::luv::file::write(uv_loop_t* loop, uv_file file, Array<uint8_t> data, i
 class ReadRequestData
 {
 private:
-    std::array<char, 1024> data;
+    std::unique_ptr<std::array<char, 1024>> data;
 public:
     uv_loop_t* loop;
     uv_file file;
-    hx::Object** array;
-    hx::Object** callbackSuccess;
-    hx::Object** callbackError;
+    RootedObject array;
+    RootedObject callbackSuccess;
+    RootedObject callbackError;
     uv_buf_t buffer;
 
-    ReadRequestData(uv_loop_t* l, uv_file f, hx::Object* a, hx::Object* cbSuccess, hx::Object* cbError) :
+    ReadRequestData(uv_loop_t* l, uv_file f, hx::Object* _array, hx::Object* _callbackSuccess, hx::Object* _callbackError) :
         loop(l),
         file(f),
-        data(std::array<char, 1024>()),
-        buffer(uv_buf_init(data.data(), data.size())),
-        array(new hx::Object*(a)),
-        callbackSuccess(new hx::Object*(cbSuccess)),
-        callbackError(new hx::Object*(cbError))
-    {
-        hx::GCAddRoot(array);
-        hx::GCAddRoot(callbackSuccess);
-        hx::GCAddRoot(callbackError);
-    }
-
-    ~ReadRequestData()
-    {
-        hx::GCRemoveRoot(array);
-        hx::GCRemoveRoot(callbackSuccess);
-        hx::GCRemoveRoot(callbackError);
-
-        delete array;
-        delete callbackSuccess;
-        delete callbackError;
-    }
+        data(std::make_unique<std::array<char, 1024>>()),
+        buffer(uv_buf_init(data->data(), data->size())),
+        array(RootedObject(_array)),
+        callbackSuccess(RootedObject(_callbackSuccess)),
+        callbackError(RootedObject(_callbackError))
+    { }
 };
 
 void read_callback(uv_fs_t* request)
@@ -162,7 +147,7 @@ void read_callback(uv_fs_t* request)
         auto gcZone        = cpp::utils::AutoGCZone();
         auto spResult      = make_uv_fs_t(request);
         auto spRequestData = std::unique_ptr<ReadRequestData>{ reinterpret_cast<ReadRequestData*>(request->data) };
-        auto callback      = Dynamic{ *spRequestData->callbackError };
+        auto callback      = Dynamic(spRequestData->callbackError);
 
         callback(request->result);
     }
@@ -172,8 +157,8 @@ void read_callback(uv_fs_t* request)
         auto gcZone        = cpp::utils::AutoGCZone();
         auto spResult      = make_uv_fs_t(request);
         auto spRequestData = std::unique_ptr<ReadRequestData>{ reinterpret_cast<ReadRequestData*>(request->data) };
-        auto callback      = Dynamic{ *spRequestData->callbackSuccess };
-        auto array         = Dynamic{ *spRequestData->array };
+        auto callback      = Dynamic(spRequestData->callbackSuccess);
+        auto array         = Dynamic(spRequestData->array);
 
         callback(array);
     }
@@ -181,7 +166,7 @@ void read_callback(uv_fs_t* request)
     {
         auto gcZone      = cpp::utils::AutoGCZone();
         auto requestData = reinterpret_cast<ReadRequestData*>(request->data);
-        auto array       = Array<char>{ reinterpret_cast<Array_obj<char>*>(*requestData->array) };
+        auto array       = Array<char>(reinterpret_cast<Array_obj<char>*>((hx::Object*)requestData->array));
         auto baseLength  = array->length;
         auto newLength   = baseLength + request->result;
 
@@ -196,21 +181,21 @@ void read_callback(uv_fs_t* request)
         if (result < 0)
         {
             auto spResult      = make_uv_fs_t(request);
-            auto spRequestData = std::unique_ptr<ReadRequestData>{ reinterpret_cast<ReadRequestData*>(request->data) };
-            auto callback      = Dynamic{ *spRequestData->callbackError };
+            auto spRequestData = std::unique_ptr<ReadRequestData>{ requestData };
+            auto callback      = Dynamic(spRequestData->callbackError);
 
             callback(result);
         }
     }
 }
 
-void cpp::luv::file::read(uv_loop_t* loop, uv_file file, Dynamic callbackSuccess, Dynamic callbackError)
+void cpp::luv::file::read(uv_loop_t* loop, uv_file file, int offset, Dynamic callbackSuccess, Dynamic callbackError)
 {
     auto data    = new ReadRequestData(loop, file, Array<char>(0, 0).mPtr, callbackSuccess.mPtr, callbackError.mPtr);
     auto request = new uv_fs_t();
     request->data = data;
 
-    auto result = uv_fs_read(loop, request, file, &data->buffer, 1, -1, read_callback);
+    auto result = uv_fs_read(loop, request, file, &data->buffer, 1, offset, read_callback);
     if (result < 0)
     {
         delete data;
