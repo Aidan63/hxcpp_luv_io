@@ -73,47 +73,37 @@ void cpp::luv::file::open(uv_loop_t* loop, String file, int flags, int mode, Dyn
     }
 }
 
-void cpp::luv::file::write(uv_loop_t* loop, uv_file file, Array<uint8_t> data, int offset, int length, Dynamic callback)
+void cpp::luv::file::write(uv_loop_t* loop, uv_file file, Array<uint8_t> data, int offset, int length, int fileOffset, Dynamic callback)
 {
-    auto buffer = uv_buf_init(data->getBase() + offset, length);
-
-    if (null() == callback)
+    class WriteRequest
     {
-        auto request = uv_fs_t();
+    public:
+        RootedObject array;
+        RootedObject callback;
 
-        uv_fs_write(loop, &request, file, &buffer, 1, -1, nullptr);
-    }
-    else
+        WriteRequest(hx::Object* _array, hx::Object* _callback) : array(RootedObject(_array)), callback(RootedObject(_callback)) {}
+    };
+
+    auto buffer  = uv_buf_init(data->getBase() + offset, length);
+    auto wrapper = [](uv_fs_t* request) {
+        auto gcZone     = cpp::utils::AutoGCZone();
+        auto spResult   = make_uv_fs_t(request);
+        auto spData     = std::unique_ptr<WriteRequest>{ reinterpret_cast<WriteRequest*>(request->data) };
+        auto callback   = Dynamic(spData->callback);
+
+        callback(request->result);
+    };
+
+    auto request = new uv_fs_t();
+    request->data = new WriteRequest(data.mPtr, callback.mPtr);
+
+    auto result = uv_fs_write(loop, request, file, &buffer, 1, fileOffset, wrapper);
+    if (result < 0)
     {
-        class WriteRequest
-        {
-        public:
-            RootedObject array;
-            RootedObject callback;
+        delete request->data;
+        delete request;
 
-            WriteRequest(hx::Object* _array, hx::Object* _callback) : array(RootedObject(_array)), callback(RootedObject(_callback)) {}
-        };
-
-        auto wrapper = [](uv_fs_t* request) {
-            auto gcZone     = cpp::utils::AutoGCZone();
-            auto spResult   = make_uv_fs_t(request);
-            auto spData     = std::unique_ptr<WriteRequest>{ reinterpret_cast<WriteRequest*>(request->data) };
-            auto callback   = Dynamic(spData->callback);
-
-            callback(request->result);
-        };
-
-        auto request = new uv_fs_t();
-        request->data = new WriteRequest(data.mPtr, callback.mPtr);
-
-        auto result = uv_fs_write(loop, request, file, &buffer, 1, -1, wrapper);
-        if (result < 0)
-        {
-            delete request->data;
-            delete request;
-
-            callback(result);
-        }
+        callback(result);
     }
 }
 
@@ -123,7 +113,7 @@ private:
     std::unique_ptr<std::array<char, 1024>> data;
 public:
     int offset;
-    uv_loop_t* loop;
+    uv_loop_t* const loop;
     const uv_file file;
     const RootedObject array;
     const RootedObject callbackSuccess;
