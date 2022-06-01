@@ -33,7 +33,7 @@ class File
      * In the case of a success the integer is the number of bytes written to the file.
      * For failures the code contains the reason.
      */
-    public function writeBytes(_bytes : Bytes, _callback : Result<Int, Code>->Void = null)
+    public function writeBytes(_bytes : Bytes, _callback : Result<Int, Code>->Void)
     {
         cpp.luv.File.write(
             @:privateAccess Thread.current().events.luvLoop,
