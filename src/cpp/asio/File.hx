@@ -23,7 +23,7 @@ class File
      * In the case of a success the integer is the number of bytes written to the file.
      * For failures the code contains the reason.
      */
-    public function writeBytes(_bytes : Bytes, _callback : Result<Int, Code>->Void)
+    public function write(_bytes : Bytes, _callback : Result<Int, Code>->Void)
     {
         cpp.luv.File.write(
             @:privateAccess Thread.current().events.luvLoop,
@@ -60,6 +60,10 @@ class File
             code -> _callback(Result.Error(new Code(code))));
     }
 
+    /**
+     * Close the file so no more requests can be made. Any pending requests will also be cancelled.
+     * @param _callback Callback to handle the result.
+     */
     public function close(_callback : Option<Code>->Void)
     {
         cpp.luv.File.close(
@@ -68,6 +72,13 @@ class File
             result -> _callback(resultToOptionCode(result)));
     }
 
+    /**
+     * Open a file for reading and / or writing.
+     * @param _file Path to the file.
+     * @param _flags Flags to specifying which operations are allowed on the opened file.
+     * @param _mode Flags for permissions on the opened file.
+     * @param _callback Callback to handle the result.
+     */
     public static function open(_file : String, _flags : OpenMode, _mode : AccessMode, _callback : Result<File, Code>->Void)
     {
         cpp.luv.File.open(
