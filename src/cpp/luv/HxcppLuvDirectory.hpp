@@ -11,4 +11,6 @@ namespace cpp::luv::directory
     void open(uv_loop_t*, String, Dynamic, Dynamic);
 
     void read(uv_loop_t*, uv_dir_t*, Dynamic, Dynamic);
+
+    void close(uv_loop_t*, uv_dir_t*, Dynamic);
 }

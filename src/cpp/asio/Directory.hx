@@ -32,17 +32,25 @@ class Directory
 
                 iter(_callback);
             },
-            code -> {
-                if (code != Code.eof)
-                {
-                    _callback(Result.Error(code));
-                }
-            });
+            code -> _callback(Result.Error(code)));
     }
 
-    public function close(_callback : Option<Code>)
+    public function close(_callback : Option<Code>->Void)
     {
-        //
+        cpp.luv.Directory.close(
+            @:privateAccess Thread.current().events.luvLoop,
+            dir,
+            code -> {
+                if (code.isError())
+                {
+                    _callback(Option.Some(code));
+                }
+                else
+                {
+                    _callback(Option.None);
+                }
+            }
+        );
     }
 
     public static function open(_directory : String, _callback : Result<Directory, Code>->Void)

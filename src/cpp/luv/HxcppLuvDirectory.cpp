@@ -119,3 +119,32 @@ void cpp::luv::directory::read(uv_loop_t* _loop, uv_dir_t* _dir, Dynamic _succes
         _failure(result);
     }
 }
+
+void cpp::luv::directory::close(uv_loop_t* _loop, uv_dir_t* _dir, Dynamic _callback)
+{
+    auto rooted  = new hx::Object*(_callback.mPtr);
+    auto request = new uv_fs_t();
+    request->data = rooted;
+
+    auto wrapper = [](uv_fs_t* response) {
+        auto gcZone     = cpp::utils::AutoGCZone();
+        auto spResponse = std::unique_ptr<uv_fs_t>{ response };
+        auto object     = cpp::utils::RootedObject(response->data);
+        auto callback   = Dynamic(object);
+
+        callback(response->result);
+    };
+
+    auto result = 0;
+    if ((result = uv_fs_closedir(_loop, request, _dir, wrapper)) < 0)
+    {
+        delete rooted;
+        delete request;
+
+        _callback(result);
+    }
+    else
+    {
+        hx::GCAddRoot(rooted);
+    }
+}

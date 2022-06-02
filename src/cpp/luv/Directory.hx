@@ -14,6 +14,9 @@ extern class Directory
 
     @:native('cpp::luv::directory::read')
     static function read(_loop : LuvLoop, _dir : LuvDir, _success : Dirent->Void, _failure : Code->Void) : Void;
+
+    @:native('cpp::luv::directory::close')
+    static function close(_loop : LuvLoop, _dir : LuvDir, _callback : Code->Void) : Void;
 }
 
 @:keep
