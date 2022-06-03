@@ -1,5 +1,6 @@
 package cpp.asio;
 
+import cpp.luv.streams.ReadStream;
 import cpp.luv.Luv.LuvProcess;
 import sys.thread.Thread;
 import cpp.asio.streams.IReadStream;
@@ -25,8 +26,8 @@ class Process
     {
         proc   = _proc;
         stdin  = null;
-        stdout = null;
-        stderr = null;
+        stdout = new ReadStream(cpp.luv.Process.getStdioStream(proc, 1));
+        stderr = new ReadStream(cpp.luv.Process.getStdioStream(proc, 2));
     }
 
     public static function spawn(_file : String, _options : ProcessOptions, _callback : Result<Process, Code>->Void)

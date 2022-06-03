@@ -1,11 +1,11 @@
 #include <hxcpp.h>
 #include "HxcppLuvProcess.hpp"
+#include "HxcppLuvStream.hpp"
 #include "hx/StdLibs.h"
 #include "RootedObject.hpp"
 #include <string>
 #include <vector>
 #include <array>
-#include <memory>
 
 // std::vector<char*> createLuvEnvironmentVars(Dynamic _map)
 // {
@@ -52,6 +52,7 @@ cpp::luv::process::SpawnData::SpawnData(
 cpp::luv::process::SpawnData::~SpawnData()
 {
     auto callback = [](uv_handle_t* handle) {
+        delete reinterpret_cast<cpp::luv::stream::StreamData*>(handle->data);
         delete handle;
     };
 
@@ -69,6 +70,10 @@ void cpp::luv::process::spawn(uv_loop_t* _loop, String _file, hx::Anon _options,
     uv_pipe_init(_loop, stdinPipe, false);
     uv_pipe_init(_loop, stderrPipe, false);
     uv_pipe_init(_loop, stdoutPipe, false);
+
+    stdinPipe->data = new cpp::luv::stream::StreamData();
+    stdoutPipe->data = new cpp::luv::stream::StreamData();
+    stderrPipe->data = new cpp::luv::stream::StreamData();
 
     auto stdio = new std::array<uv_stdio_container_t, 3>();
     stdio->at(0).flags = static_cast<uv_stdio_flags>(UV_CREATE_PIPE | UV_READABLE_PIPE);

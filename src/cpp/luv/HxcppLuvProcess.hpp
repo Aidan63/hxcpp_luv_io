@@ -2,6 +2,8 @@
 
 #include <hxcpp.h>
 #include <uv.h>
+#include <memory>
+#include "RootedObject.hpp"
 
 namespace cpp::luv::process
 {

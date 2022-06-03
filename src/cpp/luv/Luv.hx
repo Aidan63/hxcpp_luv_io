@@ -51,6 +51,7 @@ enum abstract RunMode(Int) {
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvFile.cpp'/>
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvDirectory.cpp'/>
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvProcess.cpp'/>
+    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvStream.cpp'/>
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils/AutoGCZone.cpp'/>
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils/RootedObject.cpp'/>
 </files>
