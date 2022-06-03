@@ -12,7 +12,7 @@ namespace cpp::utils
     public:
         RootedObject(void*);
         RootedObject(hx::Object**);
-        RootedObject(hx::Object* object);
+        RootedObject(hx::Object*);
 
         ~RootedObject();
 

@@ -1,18 +1,18 @@
 package cpp.luv;
 
-import sys.thread.Thread;
+import cpp.luv.Luv.LuvStream;
+import cpp.asio.Code;
 import cpp.luv.Luv.LuvLoop;
+import cpp.luv.Luv.LuvProcess;
 
 @:keep
 @:unreflective
-@:include('HxcppLuv.hpp')
+@:include('HxcppLuvProcess.hpp')
 extern class Process
 {
-    static inline function spawn(_file : String, _args : Array<String>, _directory : String, _stdout : String->Void, _stderr : String->Void, _complete : Int->Void)
-    {
-        luvSpawn(@:privateAccess Thread.current().events.luvLoop, _file, _args, _directory, _stdout, _stderr, _complete);
-    }
+    @:native('cpp::luv::process::spawn')
+    static function spawn(_loop : LuvLoop, _file : String, _options : Object, _success : LuvProcess->Void, _failure : Code->Void) : Void;
 
-    @:native('cpp::luv::luvSpawn')
-    private static function luvSpawn(_loop : LuvLoop, _file : String, _args : Array<String>, _directory : String, _stdout : Dynamic, _stderr : Dynamic, _complete : Dynamic) : Void;
+    @:native('cpp::luv::process::getStdioStream')
+    static function getStdioStream(_process : LuvProcess, _index : Int) : LuvStream;
 }
