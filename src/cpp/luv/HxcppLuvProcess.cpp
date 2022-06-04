@@ -7,31 +7,34 @@
 #include <vector>
 #include <array>
 
-// std::vector<char*> createLuvEnvironmentVars(Dynamic _map)
-// {
-//     auto keys = __string_hash_keys(_map);
-//     auto luv  = std::vector<char*>();
+std::vector<char*>* createLuvEnvironmentVars(Dynamic _map)
+{
+    auto keys = __string_hash_keys(_map);
+    auto luv  = new std::vector<char*>();
     
-//     for (auto i = 0; i < keys->length; i++)
-//     {
-//         auto key  = keys[i];
-//         auto item = __string_hash_get_string(_map, key);
+    for (auto i = 0; i < keys->length; i++)
+    {
+        auto key  = keys[i];
+        auto item = __string_hash_get_string(_map, key);
 
-//         if (null() == item)
-//         {
-//             luv.push_back((std::string(key.utf8_str()) + std::string("=") + std::string(item.utf8_str())).data());
-//         }
-//         else
-//         {
-//             luv.push_back(const_cast<char*>(key.utf8_str()));
-//         }
-//     }
+        if (null() != item)
+        {
+            luv->push_back((std::string(key.utf8_str()) + std::string("=") + std::string(item.utf8_str())).data());
+        }
+        else
+        {
+            luv->push_back(const_cast<char*>(key.utf8_str()));
+        }
+    }
 
-//     return luv;
-// }
+    luv->push_back(nullptr);
+
+    return luv;
+}
 
 cpp::luv::process::SpawnData::SpawnData(
-    std::array<char*, 2>* _args,
+    std::vector<char*>* _args,
+    std::vector<char*>* _envs,
     uv_process_options_t* _options,
     hx::Object* _cbSuccess,
     hx::Object* _cbFailure,
@@ -40,6 +43,7 @@ cpp::luv::process::SpawnData::SpawnData(
     uv_pipe_t* _stderrPipe) :
     args(_args),
     options(_options),
+    envs(_envs),
     cbSuccess(_cbSuccess),
     cbFailure(_cbFailure),
     stdinPipe(_stdinPipe),
@@ -85,12 +89,20 @@ void cpp::luv::process::spawn(uv_loop_t* _loop, String _file, hx::Anon _options,
     stdio->at(2).data.stream = reinterpret_cast<uv_stream_t*>(stderrPipe);
 
     auto hxCwd  = _options->__Field("cwd", HX_PROP_ALWAYS).asString();
-    auto hxArgs = _options->__Field("args", HX_PROP_ALWAYS).asObject();
+    auto hxArgs = Array<String>(RawAutoCast(_options->__Field("args", HX_PROP_ALWAYS).asObject()));
     auto hxEnv  = _options->__Field("env", HX_PROP_ALWAYS).asObject()->__Field("h", HX_PROP_ALWAYS).asObject();
 
-    auto args = new std::array<char*, 2>();
+    // arg 0 must be the program, and the final one must be null
+    // everything inbetween are our actual args
+    std::vector<char*>* envs = nullptr;
+    auto args = new std::vector<char*>(2 + hxArgs->length);
     args->at(0) = const_cast<char*>(_file.utf8_str());
-    args->at(1) = nullptr;
+    args->at(1 + hxArgs->length) = nullptr;
+
+    for (auto i = 0; i < hxArgs->length; i++)
+    {
+        args->at(1 + i) = const_cast<char*>(hxArgs[i].utf8_str());
+    }
 
     auto options = new uv_process_options_t();
     options->file        = args->at(0);
@@ -102,7 +114,16 @@ void cpp::luv::process::spawn(uv_loop_t* _loop, String _file, hx::Anon _options,
         delete process;
     };
 
-    auto data    = new SpawnData(args, options, _success.mPtr, _failure.mPtr, stdinPipe, stdoutPipe, stderrPipe);
+    if (null() != hxCwd)
+    {
+        options->cwd = hxCwd.utf8_str();
+    }
+    if (nullptr != hxEnv)
+    {
+        options->env = (envs = createLuvEnvironmentVars(hxEnv))->data();
+    }
+
+    auto data    = new SpawnData(args, envs, options, _success.mPtr, _failure.mPtr, stdinPipe, stdoutPipe, stderrPipe);
     auto request = new uv_process_t();
     request->data = data;
 
