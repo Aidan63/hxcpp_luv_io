@@ -1,7 +1,7 @@
 package sys.thread;
 
 import cpp.luv.Async;
-import cpp.luv.LuvEventLoop;
+import cpp.luv.Timer;
 import cpp.luv.Luv;
 
 /**
@@ -86,8 +86,8 @@ class EventLoop
 		run(() -> {
 			final event = (eventHandler : RegularEvent);
 
-			LuvEventLoop.timer_stop(event.handle);
-			LuvEventLoop.timer_close(event.handle);
+			Timer.stop(event.handle);
+			Timer.close(event.handle);
 		});
 	}
 
@@ -182,7 +182,7 @@ class EventLoop
 
 		for (event in queue)
 		{
-			event.handle = LuvEventLoop.queueRepeatTask(luvLoop, event.interval, event.task);
+			event.handle = Timer.repeat(luvLoop, event.interval, event.task);
 		}
 
 		queue.resize(0);
