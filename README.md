@@ -3,7 +3,7 @@ Libuv powered asynchronous IO and haxe event loop, more functions and classes wi
 ### File
 
 ```haxe
-File.open(
+cpp.asio.File.open(
     'file.txt',
     OpenMode.ReadWrite | OpenMode.Append,
     AccessMode.UserReadWriteExecute,
@@ -53,12 +53,20 @@ cpp.asio.Directory.open(
     result -> {
         switch result {
             case Success(dir):
+                // `dir` is the object to manipulate the opened directory.
+                // Currently iterating over the items within the directory is the only supported operation.
+
                 dir.iter(result -> {
+                    // This callback can be invoked multiple times, once for each item in the directory.
+                    // `Error(Code.eof)` is returned after all items have been iterated.
+
                     switch result {
                         case Success(entry):
                             trace(entry.name, entry.type);
                         case Error(error):
                             trace(error);
+
+                            // Once error has been raised no further `iter` callbacks will be made
 
                             dir.close(result -> {
                                 switch result {
