@@ -5,12 +5,6 @@
 #include "HxcppLuv.hpp"
 #include "AutoGCZone.hpp"
 
-struct uv_close_callback_data {
-    hx::Object* callback;
-    uv_handle_t* stdout_pipe;
-    uv_handle_t* stderr_pipe;
-};
-
 uv_loop_t* cpp::luv::allocLoop()
 {
     auto loop = reinterpret_cast<uv_loop_t*>(HxAlloc(sizeof(uv_loop_t)));
