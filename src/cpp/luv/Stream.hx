@@ -14,4 +14,7 @@ extern class Stream
 
     @:native('cpp::luv::stream::stop')
     static function stop(_stream : LuvStream) : Void;
+
+    @:native('cpp::luv::stream::write')
+    static function write(_stream : LuvStream, _buffer : BytesData, _callback : Int->Void) : Void;
 }

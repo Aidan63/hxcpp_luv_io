@@ -15,8 +15,20 @@ class WriteStream implements IWriteStream
         stream = _stream;
     }
 
-    public function write(_data : Bytes, _callback : Option<Code>->Void)
+    public function write(_bytes : Bytes, _callback : Option<Code>->Void)
     {
-        //
+        cpp.luv.Stream.write(
+            stream,
+            _bytes.getData(),
+            status -> {
+                if (status < 0)
+                {
+                    _callback(Option.Some(new Code(status)));
+                }
+                else
+                {
+                    _callback(Option.None);
+                }
+            });
     }
 }

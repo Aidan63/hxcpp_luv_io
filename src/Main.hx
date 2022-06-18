@@ -1,3 +1,4 @@
+import haxe.io.Bytes;
 import sys.thread.EventLoop.EventHandler;
 import cpp.vm.Gc;
 import sys.thread.Thread;
@@ -17,19 +18,29 @@ class Main {
         //     Thread.current().events.cancel(handle);
         // }, 1000);
 
-        cpp.asio.TTY.open(Stdin, result -> {
+        cpp.asio.TTY.open(Stdout, result -> {
             switch result {
                 case Success(tty):
-                    tty.read.read(result -> {
+                    tty.write.write(Bytes.ofString('HELLO\r\n'), result -> {
                         switch result {
-                            case Success(data):
-                                trace(data);
-                            case Error(error):
-                                trace(error);
+                            case Some(v):
+                                trace(v);
+                            case None:
+                                trace('done');
                         }
 
                         tty.close();
                     });
+                    // tty.read.read(result -> {
+                    //     switch result {
+                    //         case Success(data):
+                    //             trace(data);
+                    //         case Error(error):
+                    //             trace(error);
+                    //     }
+
+                    //     tty.close();
+                    // });
                 case Error(error):
                     trace('failed to open stdin ${ error }');
             }
