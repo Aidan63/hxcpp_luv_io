@@ -1,0 +1,28 @@
+<xml>
+    <compiler id='MSVC' exe='cl.exe'>
+        <flag value = '/std:c++17'/>
+    </compiler>
+    <files id='haxe'>
+        <compilerflag value='-I${this_dir}'/>
+        <compilerflag value='-I${this_dir}/../utils'/>
+
+        <file name='${this_dir}/HxcppLuv.cpp'/>
+        <file name='${this_dir}/HxcppLuvFile.cpp'/>
+        <file name='${this_dir}/HxcppLuvDirectory.cpp'/>
+        <file name='${this_dir}/HxcppLuvProcess.cpp'/>
+        <file name='${this_dir}/HxcppLuvStream.cpp'/>
+        <file name='${this_dir}/HxcppLuvAsync.cpp'/>
+        <file name='${this_dir}/HxcppLuvTimer.cpp'/>
+        <file name='${this_dir}/../utils/AutoGCZone.cpp'/>
+        <file name='${this_dir}/../utils/RootedObject.cpp'/>
+    </files>
+
+    <files id='luv'>
+        <compilerflag value='-I${this_dir}'/>
+        <compilerflag value='-I${this_dir}/../utils'/>
+    </files>
+
+    <target id='haxe'>
+        <files id='luv'/>
+    </target>
+</xml>

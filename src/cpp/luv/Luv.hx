@@ -51,33 +51,8 @@ enum abstract RunMode(Int) {
 @:keep
 @:unreflective
 @:include('HxcppLuv.hpp')
-@:buildXml("
-<compiler id='MSVC' exe='cl.exe'>
-    <flag value = '/std:c++17'/>
-</compiler>
-<files id='haxe'>
-    <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv'/>
-    <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils'/>
-
-    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuv.cpp'/>
-    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvFile.cpp'/>
-    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvDirectory.cpp'/>
-    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvProcess.cpp'/>
-    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvStream.cpp'/>
-    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvAsync.cpp'/>
-    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvTimer.cpp'/>
-    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils/AutoGCZone.cpp'/>
-    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils/RootedObject.cpp'/>
-</files>
-
-<files id='luv'>
-    <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv'/>
-    <compilerflag value='-IC:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils'/>
-</files>
-
-<target id='haxe'>
-    <files id='luv'/>
-</target>")
+@:build(linc.Linc.touch())
+@:build(linc.Linc.xml('luv'))
 extern class Luv
 {
     @:native('::cpp::luv::allocLoop')
