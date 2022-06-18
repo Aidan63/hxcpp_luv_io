@@ -42,6 +42,12 @@ extern class LuvProcess {}
 @:native('::cpp::Pointer<uv_async_t>')
 extern class LuvAsync {}
 
+@:keep
+@:unreflective
+@:include('uv.h')
+@:native('::cpp::Pointer<uv_tty_t>')
+extern class LuvTTY {}
+
 enum abstract RunMode(Int) {
     var Default;
     var Once;

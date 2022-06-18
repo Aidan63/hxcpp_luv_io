@@ -7,15 +7,33 @@ import cpp.asio.AccessMode;
 
 class Main {
     static function main() {
-        var handle : EventHandler = null;
+        // var handle : EventHandler = null;
 
-        handle = Thread.current().events.repeat(() -> {
-            trace('gc time');
+        // handle = Thread.current().events.repeat(() -> {
+        //     trace('gc time');
 
-            Gc.run(true);
+        //     Gc.run(true);
 
-            Thread.current().events.cancel(handle);
-        }, 1000);
+        //     Thread.current().events.cancel(handle);
+        // }, 1000);
+
+        cpp.asio.TTY.open(Stdin, result -> {
+            switch result {
+                case Success(tty):
+                    tty.read.read(result -> {
+                        switch result {
+                            case Success(data):
+                                trace(data);
+                            case Error(error):
+                                trace(error);
+                        }
+
+                        tty.close();
+                    });
+                case Error(error):
+                    trace('failed to open stdin ${ error }');
+            }
+        });
 
         cpp.asio.Process
             .spawn(

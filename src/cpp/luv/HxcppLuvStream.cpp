@@ -52,9 +52,17 @@ void cpp::luv::stream::read(uv_stream_t* _stream, Dynamic _success, Dynamic _fai
         }
     };
 
+    // We need this explicit GC free zone as sometimes the alloc call is not defered to the event loop.
+    // This seems to happen when reading tty streams for example.
+    // So ensure we are in a free zone for our `uv_read_start` call so the RTTI gc zone in the callback works as expected.
+
+    hx::EnterGCFreeZone();
+
     auto result = 0;
     if ((result = uv_read_start(_stream, alloc, read)) < 0)
     {
+        hx::ExitGCFreeZone();
+
         _failure(result);
     }
     else
@@ -62,6 +70,8 @@ void cpp::luv::stream::read(uv_stream_t* _stream, Dynamic _success, Dynamic _fai
         auto data = reinterpret_cast<StreamData*>(_stream->data);
         data->success = _success.mPtr;
         data->failure = _failure.mPtr;
+
+        hx::ExitGCFreeZone();
     }
 }
 
