@@ -1,5 +1,6 @@
 package sys.thread;
 
+import cpp.luv.Async;
 import cpp.luv.LuvEventLoop;
 import cpp.luv.Luv;
 
@@ -37,24 +38,22 @@ enum NextEventTime
 @:coreApi
 class EventLoop
 {
-	final mutex : Mutex;
+	final lock : Mutex;
 
-	final oneTimeEvents : Array<Null<Void->Void>>;
-
-	final waitLock : Lock;
-
-	var oneTimeEventsIdx = 0;
-
-	var promisedEventsCount = 0;
+	final queue : Array<RegularEvent>;
 
     final luvLoop : LuvLoop;
 
+	final async : LuvAsync;
+
 	public function new()
 	{
-		mutex         = new Mutex();
-		oneTimeEvents = [];
-		waitLock      = new Lock();
-        luvLoop       = Luv.allocLoop();
+		lock    = new Mutex();
+		queue   = [];
+        luvLoop = Luv.allocLoop();
+		async   = Async.init(luvLoop, enqueue);
+
+		Async.unref(async);
     }
 
 	/**
@@ -65,13 +64,17 @@ class EventLoop
 	 */
 	public function repeat(event : Void->Void, intervalMs : Int) : EventHandler
 	{
-		mutex.acquire();
+		final handle = new RegularEvent(event, intervalMs);
+
+		lock.acquire();
 		
-		final handle = LuvEventLoop.queueRepeatTask(luvLoop, intervalMs, event);
+		queue.push(handle);
 
-		mutex.release();
+		lock.release();
 
-		return new RegularEvent(handle);
+		Async.send(async);
+
+		return handle;
 	}
 
 	/**
@@ -80,13 +83,12 @@ class EventLoop
 	 */
 	public function cancel(eventHandler : EventHandler) : Void
 	{
-		mutex.acquire();
-		
-		final event = (eventHandler : RegularEvent);
+		run(() -> {
+			final event = (eventHandler : RegularEvent);
 
-		LuvEventLoop.cancelTask(event.handle);
-
-		mutex.release();
+			LuvEventLoop.timer_stop(event.handle);
+			LuvEventLoop.timer_close(event.handle);
+		});
 	}
 
 	/**
@@ -97,9 +99,7 @@ class EventLoop
 	 */
 	public function promise() : Void
 	{
-		mutex.acquire();
-		++promisedEventsCount;
-		mutex.release();
+		//
 	}
 
 	/**
@@ -108,11 +108,13 @@ class EventLoop
 	 */
 	public function run(event : Void->Void) : Void
 	{
-		mutex.acquire();
+		lock.acquire();
 		
-		LuvEventLoop.queueRepeatTask(luvLoop, 0, event);
+		queue.push(new RegularEvent(event, 0));
 
-		mutex.release();
+		lock.release();
+
+		Async.send(async);
 	}
 
 	/**
@@ -121,11 +123,7 @@ class EventLoop
 	 */
 	public function runPromised(event : Void->Void) : Void
 	{
-		mutex.acquire();
-		oneTimeEvents[oneTimeEventsIdx++] = event;
-		--promisedEventsCount;
-		waitLock.release();
-		mutex.release();
+		//
 	}
 
 	/**
@@ -162,7 +160,7 @@ class EventLoop
 	 */
 	public function wait(?timeout : Float) : Bool
 	{
-		return waitLock.wait(timeout);
+		return false;
 	}
 
 	/**
@@ -177,16 +175,35 @@ class EventLoop
 	{
 		Luv.runLoop(luvLoop, Default);
 	}
+
+	function enqueue() : Void
+	{
+		lock.acquire();
+
+		for (event in queue)
+		{
+			event.handle = LuvEventLoop.queueRepeatTask(luvLoop, event.interval, event.task);
+		}
+
+		queue.resize(0);
+
+		lock.release();
+	}
 }
 
 abstract EventHandler(RegularEvent) from RegularEvent to RegularEvent {}
 
 private class RegularEvent
 {
-	public final handle : LuvHandle;
+	public final task : Void->Void;
 
-	public function new(_handle)
+	public final interval : Int;
+
+	public var handle : Null<LuvTimer>;
+
+	public function new(_task, _interval)
 	{
-		handle = _handle;
+		task     = _task;
+		interval = _interval;
 	}
 }

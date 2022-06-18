@@ -15,6 +15,12 @@ extern class LuvHandle {}
 @:keep
 @:unreflective
 @:include('uv.h')
+@:native('::cpp::Pointer<uv_timer_t>')
+extern class LuvTimer {}
+
+@:keep
+@:unreflective
+@:include('uv.h')
 @:native('::cpp::Pointer<uv_stream_t>')
 extern class LuvStream {}
 
@@ -29,6 +35,12 @@ extern class LuvDir {}
 @:include('uv.h')
 @:native('::cpp::Pointer<uv_process_t>')
 extern class LuvProcess {}
+
+@:keep
+@:unreflective
+@:include('uv.h')
+@:native('::cpp::Pointer<uv_async_t>')
+extern class LuvAsync {}
 
 enum abstract RunMode(Int) {
     var Default;
@@ -52,6 +64,7 @@ enum abstract RunMode(Int) {
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvDirectory.cpp'/>
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvProcess.cpp'/>
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvStream.cpp'/>
+    <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/luv/HxcppLuvAsync.cpp'/>
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils/AutoGCZone.cpp'/>
     <file name='C:/Users/AidanLee/Desktop/hxcpp_luv/src/cpp/utils/RootedObject.cpp'/>
 </files>

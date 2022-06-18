@@ -14,19 +14,13 @@ namespace cpp::luv
 
     bool runLoop(uv_loop_t*, int);
 
-    void luvSpawn(uv_loop_t*, String, Array<String>, String, Dynamic, Dynamic, Dynamic);
-
-    void cbProcessExit(uv_process_t*, int64_t, int);
-
-    void cbAllocBuffer(uv_handle_t*, size_t, uv_buf_t*);
-
-    void cbReadPipe(uv_stream_t*, ssize_t, const uv_buf_t*);
-
     /** event loop functions **/
 
-    uv_handle_t* queue_repeat_task(uv_loop_t*, int, Dynamic);
+    uv_timer_t* queue_repeat_task(uv_loop_t*, int, Dynamic);
 
-    bool cancel_task(uv_handle_t*);
+    int timer_stop(uv_timer_t*);
+    
+    void timer_close(uv_timer_t*);
 
     /** util functions **/
 
