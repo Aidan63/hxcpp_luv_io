@@ -14,6 +14,7 @@
         <file name='${this_dir}/HxcppLuvAsync.cpp'/>
         <file name='${this_dir}/HxcppLuvTimer.cpp'/>
         <file name='${this_dir}/HxcppLuvTTY.cpp'/>
+        <file name='${this_dir}/HxcppLuvSignal.cpp'/>
         <file name='${this_dir}/../utils/AutoGCZone.cpp'/>
         <file name='${this_dir}/../utils/RootedObject.cpp'/>
     </files>

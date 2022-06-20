@@ -48,6 +48,12 @@ extern class LuvAsync {}
 @:native('::cpp::Pointer<uv_tty_t>')
 extern class LuvTTY {}
 
+@:keep
+@:unreflective
+@:include('uv.h')
+@:native('::cpp::Pointer<uv_signal_t>')
+extern class LuvSignal {}
+
 enum abstract RunMode(Int) {
     var Default;
     var Once;

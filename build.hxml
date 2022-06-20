@@ -1,6 +1,6 @@
 -cp src
 -D analyzer-optimize
 -main Main
---macro vcpkg.Vcpkg.install('vcpkg_installed')
+--macro vcpkg.Vcpkg.install('vcpkg_installed/x86-windows')
 --cpp bin
 --debug
