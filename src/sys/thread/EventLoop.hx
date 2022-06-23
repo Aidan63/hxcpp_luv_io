@@ -173,6 +173,8 @@ class EventLoop
 	 */
 	public function loop() : Void
 	{
+		enqueue();
+
 		Luv.runLoop(luvLoop, Default);
 	}
 
