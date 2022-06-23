@@ -109,3 +109,64 @@ cpp.asio.Process.spawn(
         }
     });
 ```
+
+## TTY
+
+```haxe
+cpp.asio.TTY.open(Stdin, result ->
+{
+    switch result
+    {
+        case Success(_stdin):
+            _stdin.read.read(result -> {
+                switch result {
+                    Success(bytes):
+                        trace(bytes.toString());
+                    case Error(error):
+                        trace(error);
+                }
+            });
+        case Error(error):
+            throw new Exception(error.toString());
+    }
+});
+
+cpp.asio.TTY.open(Stdout, result ->
+{
+    switch result
+    {
+        case Success(_stdout):
+            _stdout.write.write(Bytes.ofString('Hello, World!'), result -> {
+                switch result {
+                    case Some(error):
+                        trace(error)
+                    case None:
+                        //
+                }
+            });
+        case Error(error):
+            throw new Exception(error.toString());
+    }
+});
+```
+
+## Signals
+
+
+```haxe
+cpp.asio.Signal.open(result -> {
+    switch result {
+        case Success(signal):
+            signal.start(Interrupt, result -> {
+                switch result {
+                    case Success(_):
+                        trace('Ctrl+C pressed');
+                    case Error(error):
+                        trace(error);
+                }
+            });
+        case Error(error):
+            trace(error);
+    }
+});
+```
