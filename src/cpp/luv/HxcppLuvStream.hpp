@@ -23,4 +23,8 @@ namespace cpp::luv::stream
     void stop(uv_stream_t*);
 
     void write(uv_stream_t*, Array<uint8_t>, Dynamic);
+
+    void shutdown(uv_stream_t*, Dynamic);
+
+    void close(uv_stream_t*);
 }

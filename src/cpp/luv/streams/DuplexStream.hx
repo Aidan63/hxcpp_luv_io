@@ -1,12 +1,13 @@
 package cpp.luv.streams;
 
-import cpp.asio.streams.IWriteStream;
-import cpp.asio.Code;
-import haxe.io.Bytes;
-import haxe.ds.Option;
 import cpp.luv.Luv.LuvStream;
+import cpp.asio.Result;
+import haxe.io.Bytes;
+import cpp.asio.Code;
+import haxe.ds.Option;
+import cpp.asio.streams.IDuplexStream;
 
-class WriteStream implements IWriteStream
+class DuplexStream implements IDuplexStream
 {
     final stream : LuvStream;
 
@@ -15,7 +16,15 @@ class WriteStream implements IWriteStream
         stream = _stream;
     }
 
-    public function write(_bytes : Bytes, _callback : Option<Code>->Void)
+	public function read(_callback:Result<Bytes, Code> -> Void)
+    {
+        cpp.luv.Stream.read(
+            stream,
+            data -> _callback(Result.Success(Bytes.ofData(data))),
+            code -> _callback(Result.Error(code)));
+    }
+
+	public function write(_bytes:Bytes, _callback:Option<Code> -> Void)
     {
         cpp.luv.Stream.write(
             stream,
@@ -30,6 +39,11 @@ class WriteStream implements IWriteStream
                     _callback(Option.None);
                 }
             });
+    }
+
+	public function stop()
+    {
+        cpp.luv.Stream.stop(stream);
     }
 
     public function shutdown(_callback : Option<Code>->Void)

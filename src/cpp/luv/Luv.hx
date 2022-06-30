@@ -54,6 +54,12 @@ extern class LuvTTY {}
 @:native('::cpp::Pointer<uv_signal_t>')
 extern class LuvSignal {}
 
+@:keep
+@:unreflective
+@:include('uv.h')
+@:native('::cpp::Pointer<uv_tcp_t>')
+extern class LuvTcp {}
+
 enum abstract RunMode(Int) {
     var Default;
     var Once;

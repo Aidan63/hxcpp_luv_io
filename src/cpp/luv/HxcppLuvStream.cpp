@@ -117,3 +117,44 @@ void cpp::luv::stream::write(uv_stream_t* _stream, Array<uint8_t> _buffer, Dynam
         request->data = new WriteData(_buffer, _callback);
     }
 }
+
+void cpp::luv::stream::shutdown(uv_stream_t* stream, Dynamic callback)
+{
+    auto result  = 0;
+    auto request = new uv_shutdown_t();
+    auto wrapper = [](uv_shutdown_t* request, int status) {
+        auto gcZone    = cpp::utils::AutoGCZone();
+        auto spRequest = std::unique_ptr<uv_shutdown_t> { request };
+        auto spRooted  = cpp::utils::RootedObject(request->data);
+        auto callback  = Dynamic(spRooted);
+
+        callback(status);
+    };
+
+    if ((result = uv_shutdown(request, stream, wrapper)) < 0)
+    {
+        delete request;
+
+        callback(result);
+    }
+    else
+    {
+        auto root = new hx::Object*(callback.mPtr);
+
+        hx::GCAddRoot(root);
+
+        request->data = root;
+    }
+}
+
+void cpp::luv::stream::close(uv_stream_t* stream)
+{
+    uv_close(reinterpret_cast<uv_handle_t*>(stream), [](uv_handle_t* handle) {
+        if (handle->data)
+        {
+            delete reinterpret_cast<cpp::luv::stream::StreamData*>(handle->data);
+        }
+        
+        delete handle;
+    });
+}
