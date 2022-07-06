@@ -7,7 +7,7 @@
 
 uv_loop_t* cpp::luv::allocLoop()
 {
-    auto loop = reinterpret_cast<uv_loop_t*>(HxAlloc(sizeof(uv_loop_t)));
+    auto loop = static_cast<uv_loop_t*>(HxAlloc(sizeof(uv_loop_t)));
     
     uv_loop_init(loop);
     

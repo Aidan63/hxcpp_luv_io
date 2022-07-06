@@ -6,7 +6,7 @@ uv_async_t* cpp::luv::async::init(uv_loop_t* loop, Dynamic callback)
 {
     auto wrapper = [](uv_async_t* response) {
         auto gcZone = cpp::utils::AutoGCZone();
-        auto object = reinterpret_cast<hx::Object**>(response->data);
+        auto object = static_cast<hx::Object**>(response->data);
         auto cb     = Dynamic(*object);
 
         cb();
@@ -35,7 +35,7 @@ int cpp::luv::async::send(uv_async_t* async)
 void cpp::luv::async::close(uv_async_t* async)
 {
     uv_close(reinterpret_cast<uv_handle_t*>(async), [](uv_handle_t* handle) {
-        hx::GCRemoveRoot(reinterpret_cast<hx::Object**>(handle->data));
+        hx::GCRemoveRoot(static_cast<hx::Object**>(handle->data));
 
         delete handle->data;
         delete handle;

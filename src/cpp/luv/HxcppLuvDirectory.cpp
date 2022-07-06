@@ -26,7 +26,7 @@ void cpp::luv::directory::open(uv_loop_t* _loop, String _path, Dynamic _success,
     auto wrapper = [](uv_fs_t* response) {
         auto gcZone     = cpp::utils::AutoGCZone();
         auto spResponse = std::unique_ptr<uv_fs_t>{ response };
-        auto request    = std::unique_ptr<OpendirData>{ reinterpret_cast<OpendirData*>(response->data) };
+        auto request    = std::unique_ptr<OpendirData>{ static_cast<OpendirData*>(response->data) };
 
         if (response->result < 0)
         {
@@ -78,7 +78,7 @@ void cpp::luv::directory::read(uv_loop_t* _loop, uv_dir_t* _dir, Dynamic _succes
     auto wrapper = [](uv_fs_t* response) {
         auto gcZone     = cpp::utils::AutoGCZone();
         auto spResponse = std::unique_ptr<uv_fs_t>{ response };
-        auto request    = std::unique_ptr<ReaddirData>{ reinterpret_cast<ReaddirData*>(response->data) };
+        auto request    = std::unique_ptr<ReaddirData>{ static_cast<ReaddirData*>(response->data) };
 
         if (response->result < 0)
         {

@@ -68,7 +68,7 @@ void cpp::luv::file::write(uv_loop_t* loop, uv_file file, Array<uint8_t> data, i
     auto wrapper = [](uv_fs_t* request) {
         auto gcZone     = cpp::utils::AutoGCZone();
         auto spResult   = make_uv_fs_t(request);
-        auto spData     = std::unique_ptr<WriteRequest>{ reinterpret_cast<WriteRequest*>(request->data) };
+        auto spData     = std::unique_ptr<WriteRequest>{ static_cast<WriteRequest*>(request->data) };
         auto callback   = Dynamic(spData->callback);
 
         callback(request->result);
@@ -120,7 +120,7 @@ void read_callback(uv_fs_t* request)
     {
         // < 0 indicates an error
         auto spResult      = make_uv_fs_t(request);
-        auto spRequestData = std::unique_ptr<ReadRequestData>{ reinterpret_cast<ReadRequestData*>(request->data) };
+        auto spRequestData = std::unique_ptr<ReadRequestData>{ static_cast<ReadRequestData*>(request->data) };
         auto callback      = Dynamic(spRequestData->callbackError);
 
         callback(request->result);
@@ -129,7 +129,7 @@ void read_callback(uv_fs_t* request)
     {
         // no more data
         auto spResult      = make_uv_fs_t(request);
-        auto spRequestData = std::unique_ptr<ReadRequestData>{ reinterpret_cast<ReadRequestData*>(request->data) };
+        auto spRequestData = std::unique_ptr<ReadRequestData>{ static_cast<ReadRequestData*>(request->data) };
         auto callback      = Dynamic(spRequestData->callbackSuccess);
         auto array         = Dynamic(spRequestData->array);
 
@@ -137,8 +137,8 @@ void read_callback(uv_fs_t* request)
     }
     else
     {
-        auto requestData = reinterpret_cast<ReadRequestData*>(request->data);
-        auto array       = Array<char>(reinterpret_cast<Array_obj<char>*>((hx::Object*)requestData->array));
+        auto requestData = static_cast<ReadRequestData*>(request->data);
+        auto array       = Array<char>(static_cast<Array_obj<char>*>((hx::Object*)requestData->array));
 
         // Increase the offset / position for the next request
         // Libuv doesn't have a seek function so we have to track it ourselves

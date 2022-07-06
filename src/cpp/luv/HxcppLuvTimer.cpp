@@ -6,7 +6,7 @@ uv_timer_t* cpp::luv::timer::repeat(uv_loop_t* loop, int interval_ms, Dynamic ta
 {
     auto callback = [](uv_timer_t* timer) {
         auto gcZone = cpp::utils::AutoGCZone();
-        auto task   = Dynamic{ *reinterpret_cast<hx::Object**>(timer->data) };
+        auto task   = Dynamic{ *static_cast<hx::Object**>(timer->data) };
 
         task();
     };
@@ -31,7 +31,7 @@ int cpp::luv::timer::stop(uv_timer_t* timer)
 void cpp::luv::timer::close(uv_timer_t* timer)
 {
     uv_close(reinterpret_cast<uv_handle_t*>(timer), [](uv_handle_t* handle) {
-        hx::GCRemoveRoot(reinterpret_cast<hx::Object**>(handle->data));
+        hx::GCRemoveRoot(static_cast<hx::Object**>(handle->data));
 
         delete handle->data;
         delete handle;

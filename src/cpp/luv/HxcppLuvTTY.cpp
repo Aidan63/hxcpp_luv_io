@@ -22,7 +22,7 @@ void cpp::luv::tty::init(uv_loop_t* _loop, int _type, Dynamic _success, Dynamic 
 void cpp::luv::tty::close(uv_tty_t* _tty)
 {
     uv_close(reinterpret_cast<uv_handle_t*>(_tty), [](uv_handle_t* handle) {
-        delete reinterpret_cast<cpp::luv::stream::StreamData*>(handle->data);
+        delete static_cast<cpp::luv::stream::StreamData*>(handle->data);
         delete handle;
     });
 }

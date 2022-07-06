@@ -2,7 +2,7 @@
 #include "RootedObject.hpp"
 
 cpp::utils::RootedObject::RootedObject(void* _baton)
-    : rooted(reinterpret_cast<hx::Object**>(_baton))
+    : rooted(static_cast<hx::Object**>(_baton))
 {
     //
 }

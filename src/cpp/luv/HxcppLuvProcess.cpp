@@ -56,7 +56,7 @@ cpp::luv::process::SpawnData::SpawnData(
 cpp::luv::process::SpawnData::~SpawnData()
 {
     auto callback = [](uv_handle_t* handle) {
-        delete reinterpret_cast<cpp::luv::stream::StreamData*>(handle->data);
+        delete static_cast<cpp::luv::stream::StreamData*>(handle->data);
         delete handle;
     };
 
@@ -110,7 +110,7 @@ void cpp::luv::process::spawn(uv_loop_t* _loop, String _file, hx::Anon _options,
     options->stdio       = stdio->data();
     options->stdio_count = stdio->size();
     options->exit_cb     = [](uv_process_t* process, int64_t status, int signal) {
-        delete reinterpret_cast<SpawnData*>(process->data);
+        delete static_cast<SpawnData*>(process->data);
         delete process;
     };
 
@@ -143,7 +143,7 @@ void cpp::luv::process::spawn(uv_loop_t* _loop, String _file, hx::Anon _options,
 
 uv_stream_t* cpp::luv::process::getStdioStream(uv_process_t* _process, int _index)
 {
-    auto data = reinterpret_cast<SpawnData*>(_process->data);
+    auto data = static_cast<SpawnData*>(_process->data);
 
     switch (_index)
     {

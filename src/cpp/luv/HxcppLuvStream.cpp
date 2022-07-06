@@ -24,7 +24,7 @@ void cpp::luv::stream::read(uv_stream_t* _stream, Dynamic _success, Dynamic _fai
 {
     auto alloc = [](uv_handle_t* handle, size_t suggested, uv_buf_t* buffer) {
         auto gcZone = cpp::utils::AutoGCZone();
-        auto data   = reinterpret_cast<StreamData*>(handle->data);
+        auto data   = static_cast<StreamData*>(handle->data);
 
         data->buffer = std::make_unique<std::vector<char>>(suggested);
 
@@ -34,7 +34,7 @@ void cpp::luv::stream::read(uv_stream_t* _stream, Dynamic _success, Dynamic _fai
 
     auto read = [](uv_stream_t* stream, ssize_t read, const uv_buf_t* buffer) {
         auto gcZone = cpp::utils::AutoGCZone();
-        auto data   = reinterpret_cast<StreamData*>(stream->data);
+        auto data   = static_cast<StreamData*>(stream->data);
 
         if (read < 0)
         {
@@ -68,7 +68,7 @@ void cpp::luv::stream::read(uv_stream_t* _stream, Dynamic _success, Dynamic _fai
     }
     else
     {
-        auto data = reinterpret_cast<StreamData*>(_stream->data);
+        auto data = static_cast<StreamData*>(_stream->data);
         data->success = _success.mPtr;
         data->failure = _failure.mPtr;
 
@@ -96,7 +96,7 @@ void cpp::luv::stream::write(uv_stream_t* _stream, Array<uint8_t> _buffer, Dynam
     auto wrapper = [](uv_write_t* request, int status) {
         auto gcZone    = cpp::utils::AutoGCZone();
         auto spRequest = std::unique_ptr<uv_write_t>{ request };
-        auto spData    = std::unique_ptr<WriteData>{ reinterpret_cast<WriteData*>(spRequest->data) };
+        auto spData    = std::unique_ptr<WriteData>{ static_cast<WriteData*>(spRequest->data) };
         auto callback  = Dynamic(spData->callback);
         
         callback(status);
@@ -152,7 +152,7 @@ void cpp::luv::stream::close(uv_stream_t* stream)
     uv_close(reinterpret_cast<uv_handle_t*>(stream), [](uv_handle_t* handle) {
         if (handle->data)
         {
-            delete reinterpret_cast<cpp::luv::stream::StreamData*>(handle->data);
+            delete static_cast<cpp::luv::stream::StreamData*>(handle->data);
         }
         
         delete handle;

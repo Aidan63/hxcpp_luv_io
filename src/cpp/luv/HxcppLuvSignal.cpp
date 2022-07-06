@@ -24,7 +24,7 @@ void cpp::luv::signal::start(uv_signal_t* signal, int signum, Dynamic callback)
     auto result  = 0;
     auto wrapper = [](uv_signal_t* signal, int signnum) {
         auto gcZone   = cpp::utils::AutoGCZone();
-        auto callback = Dynamic(*reinterpret_cast<hx::Object**>(signal->data));
+        auto callback = Dynamic(*static_cast<hx::Object**>(signal->data));
 
         callback(signnum);
     };
@@ -47,7 +47,7 @@ void cpp::luv::signal::stop(uv_signal_t* signal)
 {
     uv_signal_stop(signal);
 
-    auto root = reinterpret_cast<hx::Object**>(signal->data);
+    auto root = static_cast<hx::Object**>(signal->data);
 
     hx::GCRemoveRoot(root);
 

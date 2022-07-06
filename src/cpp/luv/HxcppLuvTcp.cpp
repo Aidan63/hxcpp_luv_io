@@ -43,7 +43,7 @@ void cpp::luv::tcp::listen(uv_tcp_t* server, Dynamic callback)
 
     auto wrapper = [](uv_stream_t* server, int status) {
         auto gcZone   = cpp::utils::AutoGCZone();
-        auto rooted   = reinterpret_cast<hx::Object**>(server->data);
+        auto rooted   = static_cast<hx::Object**>(server->data);
         auto callback = Dynamic(*rooted);
 
         callback(status);
