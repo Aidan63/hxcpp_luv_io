@@ -16,6 +16,8 @@ namespace cpp::utils
 
         ~RootedObject();
 
+        hx::Object* getObject();
+
         operator hx::Object*() const;
     };
 }

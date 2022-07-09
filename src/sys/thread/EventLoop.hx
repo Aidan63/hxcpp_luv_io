@@ -64,7 +64,7 @@ class EventLoop
 	 */
 	public function repeat(event : Void->Void, intervalMs : Int) : EventHandler
 	{
-		final handle = new RegularEvent(event, intervalMs);
+		final handle = new RegularEvent(EventType.Repeat, event, intervalMs);
 
 		lock.acquire();
 		
@@ -110,7 +110,7 @@ class EventLoop
 	{
 		lock.acquire();
 		
-		queue.push(new RegularEvent(event, 0));
+		queue.push(new RegularEvent(EventType.OneShot, event, 0));
 
 		lock.release();
 
@@ -184,7 +184,13 @@ class EventLoop
 
 		for (event in queue)
 		{
-			event.handle = Timer.repeat(luvLoop, event.interval, event.task);
+			event.handle = switch event.type
+			{
+				case OneShot:
+					Timer.run(luvLoop, event.task);
+				case Repeat:
+					Timer.repeat(luvLoop, event.interval, event.task);
+			}
 		}
 
 		queue.resize(0);
@@ -195,16 +201,25 @@ class EventLoop
 
 abstract EventHandler(RegularEvent) from RegularEvent to RegularEvent {}
 
+private enum abstract EventType(Int)
+{
+	var OneShot;
+	var Repeat;
+}
+
 private class RegularEvent
 {
+	public final type : EventType;
+
 	public final task : Void->Void;
 
 	public final interval : Int;
 
 	public var handle : Null<LuvTimer>;
 
-	public function new(_task, _interval)
+	public function new(_type, _task, _interval)
 	{
+		type     = _type;
 		task     = _task;
 		interval = _interval;
 	}

@@ -30,3 +30,8 @@ cpp::utils::RootedObject::operator hx::Object*() const
 {
     return *rooted;
 }
+
+hx::Object* cpp::utils::RootedObject::getObject()
+{
+    return *rooted;
+}
