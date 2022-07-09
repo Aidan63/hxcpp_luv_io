@@ -69,7 +69,6 @@ void cpp::luv::tcp::accept(uv_tcp_t* server, Dynamic success, Dynamic failure)
     auto client = std::make_unique<uv_tcp_t>();
 
     uv_tcp_init(server->loop, client.get());
-    uv_tcp_nodelay(client.get(), true);
 
     if ((result = uv_accept(reinterpret_cast<uv_stream_t*>(server), reinterpret_cast<uv_stream_t*>(client.get()))) < 0)
     {
