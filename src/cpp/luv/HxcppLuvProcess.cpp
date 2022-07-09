@@ -19,7 +19,7 @@ std::vector<char*>* createLuvEnvironmentVars(Dynamic _map)
 
         if (null() != item)
         {
-            luv->push_back((std::string(key.utf8_str()) + std::string("=") + std::string(item.utf8_str())).data());
+            luv->push_back(const_cast<char*>((std::string(key.utf8_str()) + std::string("=") + std::string(item.utf8_str())).data()));
         }
         else
         {
