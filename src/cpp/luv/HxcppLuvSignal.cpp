@@ -56,8 +56,5 @@ void cpp::luv::signal::stop(uv_signal_t* signal)
 
 void cpp::luv::signal::close(uv_signal_t* signal)
 {
-    uv_close(reinterpret_cast<uv_handle_t*>(signal), [](uv_handle_t* handle) {
-        delete handle->data;
-        delete handle;
-    });
+    uv_close(reinterpret_cast<uv_handle_t*>(signal), [](uv_handle_t* handle) { delete handle; });
 }

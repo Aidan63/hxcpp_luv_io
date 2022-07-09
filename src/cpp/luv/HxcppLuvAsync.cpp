@@ -35,9 +35,11 @@ int cpp::luv::async::send(uv_async_t* async)
 void cpp::luv::async::close(uv_async_t* async)
 {
     uv_close(reinterpret_cast<uv_handle_t*>(async), [](uv_handle_t* handle) {
-        hx::GCRemoveRoot(static_cast<hx::Object**>(handle->data));
+        auto data = static_cast<hx::Object**>(handle->data);
 
-        delete handle->data;
+        hx::GCRemoveRoot(data);
+
+        delete data;
         delete handle;
     });
 }

@@ -135,13 +135,13 @@ class EventLoop
 	 */
 	public function progress() : NextEventTime
 	{
-		if (Luv.runLoop(luvLoop, NoWait))
+		return if (Luv.runLoop(luvLoop, NoWait))
 		{
-			return AnyTime(null);
+			AnyTime(null);
 		}
 		else
 		{
-			return Never;
+			Never;
 		}
 	}
 

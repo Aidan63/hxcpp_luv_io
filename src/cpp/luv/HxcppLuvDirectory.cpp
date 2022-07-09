@@ -46,7 +46,7 @@ void cpp::luv::directory::open(uv_loop_t* _loop, String _path, Dynamic _success,
     auto result = 0;
     if ((result = uv_fs_opendir(_loop, request, _path.utf8_str(), wrapper) < 0))
     {
-        delete request->data;
+        delete static_cast<OpendirData*>(request->data);
         delete request;
 
         _failure(result);
@@ -113,7 +113,7 @@ void cpp::luv::directory::read(uv_loop_t* _loop, uv_dir_t* _dir, Dynamic _succes
     auto result = 0;
     if ((result = uv_fs_readdir(_loop, request, _dir, wrapper)) < 0)
     {
-        delete request->data;
+        delete static_cast<ReaddirData*>(request->data);
         delete request;
 
         _failure(result);

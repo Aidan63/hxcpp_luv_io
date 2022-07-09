@@ -80,7 +80,7 @@ void cpp::luv::file::write(uv_loop_t* loop, uv_file file, Array<uint8_t> data, i
     auto result = uv_fs_write(loop, request, file, &buffer, 1, fileOffset, wrapper);
     if (result < 0)
     {
-        delete request->data;
+        delete static_cast<WriteRequest*>(request->data);
         delete request;
 
         callback(result);
