@@ -1,6 +1,9 @@
 #pragma once
 
+#ifndef HXCPP_H
 #include <hxcpp.h>
+#endif
+
 #include <uv.h>
 #include <memory>
 #include "RootedObject.hpp"
