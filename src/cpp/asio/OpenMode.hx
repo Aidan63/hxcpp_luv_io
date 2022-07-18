@@ -1,30 +1,27 @@
 package cpp.asio;
 
 @:include('uv.h')
-extern enum abstract OpenMode(Int) to Int
+extern class OpenMode
 {
-    @:native('UV_FS_O_APPEND') var Append;
-    @:native('UV_FS_O_CREAT') var Create;
-    @:native('UV_FS_O_DIRECT') var Direct;
-    @:native('UV_FS_O_DIRECTORY') var Directory;
-    @:native('UV_FS_O_DSYNC') var DSync;
-    @:native('UV_FS_O_EXCL') var Exclusive;
-    @:native('UV_FS_O_EXLOCK') var ExclusiveLock;
-    @:native('UV_FS_O_FILEMAP') var FileMap;
-    @:native('UV_FS_O_NOATIME') var NoAccessTime;
-    @:native('UV_FS_O_NOCTTY') var NoControllingTerminal;
-    @:native('UV_FS_O_NOFOLLOW') var NoFollow;
-    @:native('UV_FS_O_NONBLOCK') var NonBlocking;
-    @:native('UV_FS_O_RANDOM') var Random;
-    @:native('UV_FS_O_RDONLY') var ReadOnly;
-    @:native('UV_FS_O_RDWR') var ReadWrite;
-    @:native('UV_FS_O_SEQUENTIAL') var Sequential;
-    @:native('UV_FS_O_SYMLINK') var SymLink;
-    @:native('UV_FS_O_SYNC') var Synchronous;
-    @:native('UV_FS_O_TEMPORARY') var Temporary;
-    @:native('UV_FS_O_TRUNC') var Truncate;
-    @:native('UV_FS_O_WRONLY') var WriteOnly;
-
-    @:op(a | b) static function or(a : OpenMode, b : OpenMode) : OpenMode;
-    @:op(a & b) static function or(a : OpenMode, b : OpenMode) : OpenMode;
+    @:native('UV_FS_O_APPEND') public static final Append : Int;
+    @:native('UV_FS_O_CREAT') public static final Create : Int;
+    @:native('UV_FS_O_DIRECT') public static final Direct : Int;
+    @:native('UV_FS_O_DIRECTORY') public static final Directory : Int;
+    @:native('UV_FS_O_DSYNC') public static final DSync : Int;
+    @:native('UV_FS_O_EXCL') public static final Exclusive : Int;
+    @:native('UV_FS_O_EXLOCK') public static final ExclusiveLock : Int;
+    @:native('UV_FS_O_FILEMAP') public static final FileMap : Int;
+    @:native('UV_FS_O_NOATIME') public static final NoAccessTime : Int;
+    @:native('UV_FS_O_NOCTTY') public static final NoControllingTerminal : Int;
+    @:native('UV_FS_O_NOFOLLOW') public static final NoFollow : Int;
+    @:native('UV_FS_O_NONBLOCK') public static final NonBlocking : Int;
+    @:native('UV_FS_O_RANDOM') public static final Random : Int;
+    @:native('UV_FS_O_RDONLY') public static final ReadOnly : Int;
+    @:native('UV_FS_O_RDWR') public static final ReadWrite : Int;
+    @:native('UV_FS_O_SEQUENTIAL') public static final Sequential : Int;
+    @:native('UV_FS_O_SYMLINK') public static final SymLink : Int;
+    @:native('UV_FS_O_SYNC') public static final Synchronous : Int;
+    @:native('UV_FS_O_TEMPORARY') public static final Temporary : Int;
+    @:native('UV_FS_O_TRUNC') public static final Truncate : Int;
+    @:native('UV_FS_O_WRONLY') public static final WriteOnly : Int;
 }

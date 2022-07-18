@@ -79,7 +79,7 @@ class File
      * @param _mode Flags for permissions on the opened file.
      * @param _callback Callback to handle the result.
      */
-    public static function open(_file : String, _flags : OpenMode, _mode : AccessMode, _callback : Result<File, Code>->Void)
+    public static function open(_file : String, _flags : Int, _mode : AccessMode, _callback : Result<File, Code>->Void)
     {
         cpp.luv.File.open(
             @:privateAccess Thread.current().events.luvLoop,
