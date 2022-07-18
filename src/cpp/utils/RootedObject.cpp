@@ -1,6 +1,12 @@
 #include <hxcpp.h>
 #include "RootedObject.hpp"
 
+cpp::utils::RootedObject::RootedObject()
+    : rooted(new hx::Object*(nullptr))
+{
+    hx::GCAddRoot(rooted);
+}
+
 cpp::utils::RootedObject::RootedObject(void* _baton)
     : rooted(static_cast<hx::Object**>(_baton))
 {
@@ -31,7 +37,12 @@ cpp::utils::RootedObject::operator hx::Object*() const
     return *rooted;
 }
 
-hx::Object* cpp::utils::RootedObject::getObject()
+hx::Object* cpp::utils::RootedObject::getObject() const
 {
     return *rooted;
+}
+
+void cpp::utils::RootedObject::setObject(hx::Object* _object) const
+{
+    *rooted = _object;
 }

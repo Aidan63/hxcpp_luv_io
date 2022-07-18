@@ -12,13 +12,15 @@ namespace cpp::utils
         hx::Object** rooted;
 
     public:
+        RootedObject();
         RootedObject(void*);
         RootedObject(hx::Object**);
         RootedObject(hx::Object*);
 
         ~RootedObject();
 
-        hx::Object* getObject();
+        hx::Object* getObject() const;
+        void setObject(hx::Object*) const;
 
         operator hx::Object*() const;
     };

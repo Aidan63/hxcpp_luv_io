@@ -10,6 +10,7 @@ typedef ProcessOptions = {
     var ?args : Array<String>;
     var ?env : Map<String, String>;
     var ?cwd : String;
+    var ?shell : Bool;
 }
 
 class Process
@@ -22,12 +23,17 @@ class Process
 
     public final stderr : IReadStream;
 
+    public var onExit : Int->Int->Void;
+
     function new(_proc)
     {
         proc   = _proc;
         stdin  = null;
         stdout = new ReadStream(cpp.luv.Process.getStdioStream(proc, 1));
         stderr = new ReadStream(cpp.luv.Process.getStdioStream(proc, 2));
+        onExit = null;
+
+        cpp.luv.Process.setExitCallback(proc, onExitForward);
     }
 
     public static function spawn(_file : String, _options : ProcessOptions, _callback : Result<Process, Code>->Void)
@@ -38,5 +44,13 @@ class Process
             _options,
             proc -> _callback(Result.Success(new Process(proc))),
             code -> _callback(Result.Error(code)));
+    }
+
+    function onExitForward(_status : Int, _signal : Int)
+    {
+        if (onExit != null)
+        {
+            onExit(_status, _signal);
+        }
     }
 }

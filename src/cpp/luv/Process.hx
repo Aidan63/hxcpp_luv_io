@@ -15,4 +15,7 @@ extern class Process
 
     @:native('cpp::luv::process::getStdioStream')
     static function getStdioStream(_process : LuvProcess, _index : Int) : LuvStream;
+
+    @:native('cpp::luv::process::setExitCallback')
+    static function setExitCallback(_process : LuvProcess, _callback : Int->Int->Void) : Void;
 }
