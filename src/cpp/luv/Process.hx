@@ -11,7 +11,7 @@ import cpp.luv.Luv.LuvProcess;
 extern class Process
 {
     @:native('cpp::luv::process::spawn')
-    static function spawn(_loop : LuvLoop, _file : String, _options : Object, _success : LuvProcess->Void, _failure : Code->Void) : Void;
+    static function spawn(_loop : LuvLoop, _file : String, _options : Dynamic, _success : LuvProcess->Void, _failure : Code->Void) : Void;
 
     @:native('cpp::luv::process::getStdioStream')
     static function getStdioStream(_process : LuvProcess, _index : Int) : LuvStream;

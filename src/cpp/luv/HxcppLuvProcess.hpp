@@ -10,7 +10,7 @@
 
 namespace cpp::luv::process
 {
-    void spawn(uv_loop_t*, String, hx::Anon, Dynamic, Dynamic);
+    void spawn(uv_loop_t*, String, Dynamic, Dynamic, Dynamic);
 
     uv_stream_t* getStdioStream(uv_process_t*, int);
 

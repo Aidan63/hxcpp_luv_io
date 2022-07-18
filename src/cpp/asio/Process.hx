@@ -6,13 +6,6 @@ import sys.thread.Thread;
 import cpp.asio.streams.IReadStream;
 import cpp.asio.streams.IWriteStream;
 
-typedef ProcessOptions = {
-    var ?args : Array<String>;
-    var ?env : Map<String, String>;
-    var ?cwd : String;
-    var ?shell : Bool;
-}
-
 class Process
 {
     final proc : LuvProcess;

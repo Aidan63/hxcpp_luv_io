@@ -77,7 +77,7 @@ namespace cpp::luv::process
         return luv;
     }
 
-    String getCwd(hx::Anon _options)
+    String getCwd(Dynamic _options)
     {
         if (null() == _options)
         {
@@ -94,7 +94,7 @@ namespace cpp::luv::process
         return field.asString();
     }
 
-    Dynamic getEnv(hx::Anon _options)
+    Dynamic getEnv(Dynamic _options)
     {
         if (null() == _options)
         {
@@ -111,7 +111,7 @@ namespace cpp::luv::process
         return Dynamic(field.asObject()->__Field("h", HX_PROP_ALWAYS).asObject());
     }
 
-    Array<String> getArgs(hx::Anon _options)
+    Array<String> getArgs(Dynamic _options)
     {
         if (null() == _options)
         {
@@ -129,7 +129,7 @@ namespace cpp::luv::process
     }
 }
 
-void cpp::luv::process::spawn(uv_loop_t* _loop, String _file, hx::Anon _options, Dynamic _success, Dynamic _failure)
+void cpp::luv::process::spawn(uv_loop_t* _loop, String _file, Dynamic _options, Dynamic _success, Dynamic _failure)
 {
     auto stdinPipe  = new uv_pipe_t();
     auto stdoutPipe = new uv_pipe_t();
