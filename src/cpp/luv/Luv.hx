@@ -70,7 +70,7 @@ enum abstract RunMode(Int) {
 @:unreflective
 @:include('HxcppLuv.hpp')
 @:build(linc.Linc.touch())
-@:build(linc.Linc.xml('luv'))
+@:build(linc.Linc.xml('Luv'))
 extern class Luv
 {
     @:native('::cpp::luv::allocLoop')
