@@ -1,5 +1,0 @@
--cp src
--D analyzer-optimize
--main Main
---cpp bin
---debug
