@@ -44,6 +44,11 @@ void cpp::luv::async::close(uv_async_t* async)
     });
 }
 
+void cpp::luv::async::ref(uv_async_t* async)
+{
+    uv_ref(reinterpret_cast<uv_handle_t*>(async));
+}
+
 void cpp::luv::async::unref(uv_async_t* async)
 {
     uv_unref(reinterpret_cast<uv_handle_t*>(async));

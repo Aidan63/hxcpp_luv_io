@@ -17,6 +17,9 @@ extern class Async
     @:native('::cpp::luv::async::close')
     static function close(_async : LuvAsync) : Int;
 
+    @:native('::cpp::luv::async::ref')
+    static function ref(_async : LuvAsync) : Void;
+
     @:native('::cpp::luv::async::unref')
     static function unref(_async : LuvAsync) : Void;
 }

@@ -14,5 +14,7 @@ namespace cpp::luv::async
 
     void close(uv_async_t*);
 
+    void ref(uv_async_t*);
+
     void unref(uv_async_t*);
 }

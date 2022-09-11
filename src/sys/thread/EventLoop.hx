@@ -3,6 +3,7 @@ package sys.thread;
 import cpp.luv.Async;
 import cpp.luv.Timer;
 import cpp.luv.Luv;
+import haxe.exceptions.NotImplementedException;
 
 /**
  * When an event loop has an available event to execute.
@@ -46,12 +47,15 @@ class EventLoop
 
 	final async : LuvAsync;
 
+	var promisedEvents : Int;
+
 	public function new()
 	{
-		lock    = new Mutex();
-		queue   = [];
-        luvLoop = Luv.allocLoop();
-		async   = Async.init(luvLoop, enqueue);
+		lock           = new Mutex();
+		queue          = [];
+        luvLoop        = Luv.allocLoop();
+		async          = Async.init(luvLoop, enqueue);
+		promisedEvents = 0;
 
 		Async.unref(async);
     }
@@ -99,7 +103,11 @@ class EventLoop
 	 */
 	public function promise() : Void
 	{
-		//
+		run(() -> {
+			promisedEvents++;
+
+			referenceAsync();
+		});
 	}
 
 	/**
@@ -123,7 +131,13 @@ class EventLoop
 	 */
 	public function runPromised(event : Void->Void) : Void
 	{
-		//
+		run(() -> {
+			promisedEvents--;
+
+			referenceAsync();
+
+			event();
+		});
 	}
 
 	/**
@@ -160,7 +174,7 @@ class EventLoop
 	 */
 	public function wait(?timeout : Float) : Bool
 	{
-		return false;
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -196,6 +210,18 @@ class EventLoop
 		queue.resize(0);
 
 		lock.release();
+	}
+
+	function referenceAsync() : Void
+	{
+		if (promisedEvents > 0)
+		{
+			Async.ref(async);
+		}
+		else
+		{
+			Async.unref(async);
+		}
 	}
 }
 
