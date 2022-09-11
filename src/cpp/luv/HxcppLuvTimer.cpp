@@ -27,13 +27,14 @@ uv_timer_t* cpp::luv::timer::run(uv_loop_t* loop, Dynamic task)
     class RunData
     {
     public:
-        std::unique_ptr<cpp::utils::RootedObject> task;
+        cpp::utils::RootedObject task;
         uv_timer_t* timer;
 
         RunData(hx::Object* _task, uv_timer_t* _timer)
+            : task(cpp::utils::RootedObject(_task))
+            , timer(_timer)
         {
-            task  = std::make_unique<cpp::utils::RootedObject>(_task);
-            timer = _timer;
+            //
         }
 
         ~RunData()
@@ -45,7 +46,7 @@ uv_timer_t* cpp::luv::timer::run(uv_loop_t* loop, Dynamic task)
     auto callback = [](uv_timer_t* timer) {
         auto gcZone = cpp::utils::AutoGCZone();
         auto root   = std::unique_ptr<RunData>{ static_cast<RunData*>(timer->data) };
-        auto obj    = root->task->getObject();
+        auto obj    = root->task.getObject();
         auto task   = Dynamic(obj);
 
         task();
