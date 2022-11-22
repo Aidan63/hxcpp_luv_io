@@ -33,6 +33,12 @@ extern class LuvDir {}
 @:keep
 @:unreflective
 @:include('uv.h')
+@:native('::cpp::Pointer<uv_pipe_t>')
+extern class LuvPipe {}
+
+@:keep
+@:unreflective
+@:include('uv.h')
 @:native('::cpp::Pointer<uv_process_t>')
 extern class LuvProcess {}
 
