@@ -8,6 +8,7 @@
     <files id='libuv'>
         <compilerflag value='-I${LIBUV_DIR}/include'/>
         <compilerflag value='-I${LIBUV_DIR}/src'/>
+        <compilerflag value="-std=c99" unless="windows" />
 
         <file name='${LIBUV_DIR}/src/fs-poll.c'/>
         <file name='${LIBUV_DIR}/src/idna.c'/>
