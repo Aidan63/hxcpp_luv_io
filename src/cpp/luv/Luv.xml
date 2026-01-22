@@ -78,6 +78,7 @@
             <file name='${LIBUV_DIR}/src/unix/fs.c'/>
             <file name='${LIBUV_DIR}/src/unix/getaddrinfo.c'/>
             <file name='${LIBUV_DIR}/src/unix/getnameinfo.c'/>
+            <file name='${LIBUV_DIR}/src/unix/internal.h'/>
             <file name='${LIBUV_DIR}/src/unix/loop-watcher.c'/>
             <file name='${LIBUV_DIR}/src/unix/loop.c'/>
             <file name='${LIBUV_DIR}/src/unix/pipe.c'/>
@@ -85,6 +86,7 @@
             <file name='${LIBUV_DIR}/src/unix/process.c'/>
             <file name='${LIBUV_DIR}/src/unix/random-devurandom.c'/>
             <file name='${LIBUV_DIR}/src/unix/signal.c'/>
+            <file name='${LIBUV_DIR}/src/unix/spinlock.h'/>
             <file name='${LIBUV_DIR}/src/unix/stream.c'/>
             <file name='${LIBUV_DIR}/src/unix/tcp.c'/>
             <file name='${LIBUV_DIR}/src/unix/thread.c'/>
@@ -110,12 +112,13 @@
             <compilerflag value='-D_DARWIN_UNLIMITED_SELECT=1'/>
             <compilerflag value='-D_DARWIN_USE_64_BIT_INODE=1'/>
 
-            <file name='${LIBUV_DIR}/src/unix/proctitle.c'/>
+            <file name='${LIBUV_DIR}/src/unix/bsd-ifaddrs.c'/>
             <file name='${LIBUV_DIR}/src/unix/darwin-proctitle.c'/>
+            <file name='${LIBUV_DIR}/src/unix/darwin-stub.h'/>
             <file name='${LIBUV_DIR}/src/unix/darwin.c'/>
             <file name='${LIBUV_DIR}/src/unix/fsevents.c'/>
-            <file name='${LIBUV_DIR}/src/unix/bsd-ifaddrs.c'/>
             <file name='${LIBUV_DIR}/src/unix/kqueue.c'/>
+            <file name='${LIBUV_DIR}/src/unix/proctitle.c'/>
             <file name='${LIBUV_DIR}/src/unix/random-getentropy.c'/>
         </section>
     </files>
