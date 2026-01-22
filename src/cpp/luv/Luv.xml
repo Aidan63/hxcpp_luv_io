@@ -4,18 +4,6 @@
     <set name="LIBUV_DIR" value="${this_dir}/../../../libuv"/>
 
     <!-- Some odd behaviour around setting cpp version -->
-    
-    <!--
-        We cant add a compiler flag for MCSV, but we can add to the compiler instead.
-        Non windows platforms have HXCPP_CPP11 defined which prevents us from using a compiler
-        to change the cpp version.
-    -->
-
-    <set name='HXCPP_NO_CPP11' value='1'/>
-
-    <compiler id='MSVC' exe='cl.exe' if='windows'>
-        <flag value = '/std:c++17'/>
-    </compiler>
 
     <files id='libuv'>
         <compilerflag value='-I${LIBUV_DIR}/include'/>
@@ -128,8 +116,6 @@
     </files>
 
     <files id='libuv-hxcpp'>
-        <compilerflag value = '-std=c++17' unless='windows'/>
-
         <compilerflag value='-I${LIBUV_DIR}/include'/>
         <compilerflag value='-I${this_dir}'/>
         <compilerflag value='-I${this_dir}/../utils'/>
