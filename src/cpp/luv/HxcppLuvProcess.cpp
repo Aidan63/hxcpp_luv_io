@@ -171,8 +171,8 @@ void cpp::luv::process::spawn(uv_loop_t* _loop, String _file, Dynamic _options, 
         args->at(0) = cmdexe ? cmdexe : "cmd.exe";
         args->at(1) = "/C";
 #else
-        args->at(0) = "/bin/sh";
-        args->at(1) = "-c";
+        args->at(0) = const_cast<char*>("/bin/sh");
+        args->at(1) = const_cast<char*>("-c");
 #endif
 
         hxArgs->insert(0, _file);
