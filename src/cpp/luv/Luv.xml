@@ -152,6 +152,7 @@
         <file name='${this_dir}/HxcppLuvSignal.cpp'/>
         <file name='${this_dir}/HxcppLuvTcp.cpp'/>
         <file name='${this_dir}/HxcppLuvPipe.cpp'/>
+        <file name='${this_dir}/HxcppLuvWork.cpp'/>
         <file name='${this_dir}/../utils/AutoGCZone.cpp'/>
         <file name='${this_dir}/../utils/RootedObject.cpp'/>
     </files>
