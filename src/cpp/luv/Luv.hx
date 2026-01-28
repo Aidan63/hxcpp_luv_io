@@ -94,6 +94,12 @@ extern class Luv
     @:native('::cpp::luv::runLoop')
     static function runLoop(_loop : LuvLoop, _mode : RunMode) : Bool;
 
+    @:native('::cpp::luv::stopLoop')
+    static function stopLoop(_loop : LuvLoop) : Void;
+
+    @:native('::cpp::luv::shutdownLoop')
+    static function shutdownLoop(_loop : LuvLoop) : Void;
+
     @:native('::cpp::luv::errorToString')
     static function errorToString(_error : Int) : String;
 }

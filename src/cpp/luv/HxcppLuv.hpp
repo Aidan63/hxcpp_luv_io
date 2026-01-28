@@ -14,6 +14,10 @@ namespace cpp::luv
 
     bool runLoop(uv_loop_t*, int);
 
+    void stopLoop(uv_loop_t*);
+
+    void shutdownLoop(uv_loop_t*);
+
     /** util functions **/
 
     String errorToString(int);
