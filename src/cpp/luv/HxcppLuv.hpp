@@ -21,4 +21,6 @@ namespace cpp::luv
     /** util functions **/
 
     String errorToString(int);
+
+    void shutdown();
 }

@@ -53,3 +53,8 @@ String cpp::luv::errorToString(int error)
 {
     return String::create(uv_strerror(error));
 }
+
+void cpp::luv::shutdown()
+{
+    uv_library_shutdown();
+}

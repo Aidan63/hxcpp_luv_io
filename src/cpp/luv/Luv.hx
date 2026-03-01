@@ -102,4 +102,7 @@ extern class Luv
 
     @:native('::cpp::luv::errorToString')
     static function errorToString(_error : Int) : String;
+
+    @:native('::cpp::luv::shutdown')
+    static function shutdown() : Void;
 }
