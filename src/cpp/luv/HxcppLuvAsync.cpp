@@ -37,7 +37,12 @@ void cpp::luv::async::close(uv_async_t* async)
     uv_close(reinterpret_cast<uv_handle_t*>(async), [](uv_handle_t* handle) {
         auto data = static_cast<hx::Object**>(handle->data);
 
+        // Removing the root touches GC memory, which must not happen from a GC free zone.
+        auto left = hx::TryExitGCFreeZone();
         hx::GCRemoveRoot(data);
+        if (left) {
+            hx::EnterGCFreeZone();
+        }
 
         delete data;
         delete handle;
