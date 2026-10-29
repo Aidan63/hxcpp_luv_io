@@ -69,12 +69,7 @@ int cpp::luv::timer::stop(uv_timer_t* timer)
 void cpp::luv::timer::close(uv_timer_t* timer)
 {
     uv_close(reinterpret_cast<uv_handle_t*>(timer), [](uv_handle_t* handle) {
-        // Removing the root touches GC memory, which must not happen from a GC free zone.
-        auto left = hx::TryExitGCFreeZone();
         delete static_cast<cpp::utils::RootedObject*>(handle->data);
-        if (left) {
-            hx::EnterGCFreeZone();
-        }
         delete handle;
     });
 }

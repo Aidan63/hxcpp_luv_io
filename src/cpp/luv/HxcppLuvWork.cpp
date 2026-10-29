@@ -9,14 +9,10 @@ void onCallback(uv_work_t* work)
 	auto top = 0;
 	hx::SetTopOfStack(&top, true);
 
-	{
-		// The root has to be removed while this thread is still registered: the GC iterates
-		// the root set without locking, and only stops registered threads while doing so.
-		auto root = std::unique_ptr<cpp::utils::RootedObject>(static_cast<cpp::utils::RootedObject*>(work->data));
-		auto task = Dynamic(root->getObject());
+	auto root = std::unique_ptr<cpp::utils::RootedObject>(static_cast<cpp::utils::RootedObject*>(work->data));
+	auto task = Dynamic(root->getObject());
 
-		task();
-	}
+	task();
 
 	hx::UnregisterCurrentThread();
 }
