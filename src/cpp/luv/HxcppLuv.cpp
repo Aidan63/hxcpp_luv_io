@@ -38,6 +38,8 @@ void cpp::luv::stopLoop(uv_loop_t* loop)
 
 void cpp::luv::shutdownLoop(uv_loop_t* loop)
 {
+    hx::AutoGCFreeZone blocking;
+
     uv_walk(loop, doWalkLoop, nullptr);
     uv_run(loop, UV_RUN_DEFAULT);
 }
